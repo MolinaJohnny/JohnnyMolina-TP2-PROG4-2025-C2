@@ -5,10 +5,19 @@ import { PublicacionesModule } from './publicaciones/publicaciones.module';
 import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { ComentariosController } from './publicaciones/comentarios.controller';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [PublicacionesModule, AuthModule, UsuariosModule],
+  imports: [
+    PublicacionesModule,
+    AuthModule,
+    UsuariosModule,
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(process.env.MONGODB_URI!),
+  ],
   controllers: [AppController, ComentariosController],
   providers: [AppService],
+  exports: [],
 })
 export class AppModule {}

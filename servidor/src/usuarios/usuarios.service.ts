@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Usuario } from './entities/usuario.entity';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UsuariosService {
-  create(createUsuarioDto: CreateUsuarioDto) {
-    return 'This action adds a new usuario';
+  constructor(@InjectModel(Usuario.name) private instModel: Model<Usuario>) {}
+
+  async create(createUsuarioDto: CreateUsuarioDto) {
+    const inst = new this.instModel(createUsuarioDto);
+    console.log(inst);
+    const guardado = await inst.save();
+
+    return guardado;
   }
 
-  findAll() {
-    return `This action returns all usuarios`;
+  async findAll() {
+    const todos = await this.instModel.find();
+    return todos;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} usuario`;
+  findOne(id: string) {
+    const resultado = this.instModel.findById(id);
+    return resultado;
   }
 
-  update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-    return `This action updates a #${id} usuario`;
+  async update(id: string, updateUsuarioDto: UpdateUsuarioDto) {
+    console.log(updateUsuarioDto);
+    const resultado = await this.instModel.updateOne(
+      { _id: id },
+      updateUsuarioDto,
+    );
+    return resultado;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} usuario`;
+  async remove(id: string) {
+    const resultado = await this.instModel.deleteOne({ _id: id });
+    return resultado;
+  }
+  findByCorreo(correo: string) {
+    return this.instModel.findOne({ correo });
   }
 }

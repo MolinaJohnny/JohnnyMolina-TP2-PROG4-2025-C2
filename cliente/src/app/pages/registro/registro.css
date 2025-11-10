@@ -1,0 +1,43 @@
+/* Contenedor principal del formulario */
+form.card {
+  max-width: 700px;
+  margin: 2rem auto;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* 🔹 Alinear algunos campos en dos columnas */
+.dos-columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* 🔹 Los campos que ocupan toda la fila */
+.columna-completa {
+  grid-column: span 2;
+}
+
+/* Ajustes visuales */
+h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+button.btn {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* 🔹 Mejor separación entre los inputs flotantes */
+.form-floating {
+  margin-bottom: 1rem;
+}
+
+/* Responsive: en pantallas chicas, las columnas se apilan */
+@media (max-width: 768px) {
+  .dos-columnas {
+    grid-template-columns: 1fr;
+  }
+}

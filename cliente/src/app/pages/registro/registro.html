@@ -1,1 +1,76 @@
-<p>registro works!</p>
+<form class="card gap-2 p-3" [formGroup]="registroForm" (ngSubmit)="enviarFormulario()"> 
+  <h1 class="h3 mb-3 fw-normal">Registro</h1>
+
+  <!-- NOMBRE y APELLIDO -->
+  <div class="dos-columnas">
+    <div class="form-floating"> 
+      <input type="text" class="form-control"
+             [class.is-invalid]="registroForm.get('name')?.touched && registroForm.get('name')?.invalid"
+             id="floatingName" placeholder="Nombre" formControlName="name"> 
+      <label for="floatingName">Nombre</label> 
+      <div class="invalid-feedback">El nombre es obligatorio</div>
+    </div>
+
+    <div class="form-floating"> 
+      <input type="text" class="form-control"
+             [class.is-invalid]="registroForm.get('apellido')?.touched && registroForm.get('apellido')?.invalid"
+             id="floatingApellido" placeholder="Apellido" formControlName="apellido"> 
+      <label for="floatingApellido">Apellido</label> 
+      <div class="invalid-feedback">El apellido es obligatorio</div>
+    </div>
+  </div>
+
+  <!-- EMAIL y USERNAME -->
+  <div class="dos-columnas">
+    <div class="form-floating">
+      <input type="email" class="form-control"
+             [class.is-invalid]="registroForm.get('email')?.touched && registroForm.get('email')?.invalid"
+             id="floatingEmail" placeholder="name@example.com" formControlName="email">
+      <label for="floatingEmail">Email</label>
+      <div class="invalid-feedback">Email inválido</div>
+    </div>
+
+    <div class="form-floating">
+      <input type="text" class="form-control"
+             [class.is-invalid]="registroForm.get('username')?.touched && registroForm.get('username')?.invalid"
+             id="floatingUsername" placeholder="Nombre de usuario" formControlName="username">
+      <label for="floatingUsername">Nombre de usuario</label>
+      <div class="invalid-feedback">El nombre de usuario es obligatorio</div>
+    </div>
+  </div>
+
+  <!-- CONTRASEÑAS -->
+  <div class="dos-columnas">
+    <div class="form-floating"> 
+      <input type="password" class="form-control"
+             [class.is-invalid]="registroForm.get('password')?.touched && registroForm.get('password')?.invalid"
+             id="floatingPassword" placeholder="Password" formControlName="password">
+      <label for="floatingPassword">Contraseña</label>
+    </div>
+
+    <div class="form-floating"> 
+      <input type="password" class="form-control"
+             [class.is-invalid]="registroForm.get('repassword')?.touched && registroForm.get('repassword')?.invalid"
+             id="floatingRepassword" placeholder="Repetir Password" formControlName="repassword">
+      <label for="floatingRepassword">Repetir Contraseña</label>
+    </div>
+  </div>
+
+  <!-- FECHA DE NACIMIENTO -->
+  <div class="form-floating">
+    <input type="date" class="form-control" id="floatingFechaNacimiento"
+           placeholder="Fecha de Nacimiento" formControlName="fechaNacimiento">
+    <label for="floatingFechaNacimiento">Fecha de Nacimiento</label>
+  </div>
+
+  <!-- DESCRIPCIÓN -->
+  <div class="form-floating">
+    <textarea class="form-control" id="floatingDescripcion"
+              placeholder="Descripcion" formControlName="descripcion" style="height: 100px"></textarea>
+    <label for="floatingDescripcion">Descripcion</label>
+  </div>
+
+  <button class="btn btn-primary w-100 py-2" type="submit" [disabled]="!registroForm.valid">
+    Registrarse
+  </button>
+</form>

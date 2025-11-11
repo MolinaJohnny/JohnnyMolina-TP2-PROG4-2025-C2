@@ -13,6 +13,7 @@ import {
 } from 'jsonwebtoken';
 import { CreateUsuarioDto } from 'src/usuarios/dto/create-usuario.dto';
 import * as bcrypt from 'bcrypt';
+import { LoginDto } from './dto/credenciales.dto';
 
 const contrasenaSecreta = 'securePassword123';
 @Injectable()
@@ -21,9 +22,26 @@ export class AuthService {
     private readonly usuariosService: UsuariosService,
     // private readonly jwtService: JwtService,
   ) {}
-
+  login(user: LoginDto) {
+    // Lee de la base de datos y confirma usuario válido y comprara contraseñas encriptadas.
+    return this.createToken(user.nombreUsuario);
+  }
   register(user: CreateUsuarioDto) {
-    return this.guardarEnCookie(user.nombreUsuario);
+    return this.createToken(user.nombreUsuario);
+  }
+
+  createToken(user: string) {
+    const payload: { user: string; admin: boolean } = {
+      user: user,
+      admin: false,
+    };
+
+    // Necesito crear un token, sign es el método
+    const token: string = sign(payload, contrasenaSecreta, {
+      expiresIn: '15m',
+    });
+
+    return { token: token };
   }
 
   verificar(authHeader: string) {

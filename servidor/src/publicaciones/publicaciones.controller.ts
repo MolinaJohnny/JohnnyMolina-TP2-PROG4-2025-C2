@@ -42,4 +42,8 @@ export class PublicacionesController {
   remove(@Param('id') id: string) {
     return this.publicacionesService.remove(+id);
   }
+  //Post de alta logica(rehabilitar)
+  //Post de comentario
+  //Put de comentario
+  //Guard de validar logueo
 }

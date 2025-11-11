@@ -1,2 +1,5 @@
 9/11
 El token retornara en modo de cookie
+
+10/11
+Falta hacer ReFresh token y eliminar algunos metodos del modulo auth

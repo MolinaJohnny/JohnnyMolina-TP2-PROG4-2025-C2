@@ -43,25 +43,27 @@
   <div class="dos-columnas">
     <div class="form-floating"> 
       <input type="password" class="form-control"
-             [class.is-invalid]="registroForm.get('password')?.touched && registroForm.get('password')?.invalid"
-             id="floatingPassword" placeholder="Password" formControlName="password">
+            [class.is-invalid]="registroForm.get('password')?.touched && registroForm.get('password')?.invalid"
+            id="floatingPassword" placeholder="Password" formControlName="password">
       <label for="floatingPassword">Contraseña</label>
-    </div>
 
-    <div class="form-floating"> 
-      <input type="password" class="form-control"
-             [class.is-invalid]="registroForm.get('repassword')?.touched && registroForm.get('repassword')?.invalid"
-             id="floatingRepassword" placeholder="Repetir Password" formControlName="repassword">
-      <label for="floatingRepassword">Repetir Contraseña</label>
+      <div class="invalid-feedback" *ngIf="registroForm.get('password')?.hasError('required')">
+        La contraseña es obligatoria
+      </div>
+      <div class="invalid-feedback" *ngIf="registroForm.get('password')?.hasError('passwordFuerte')">
+        La contraseña debe tener al menos una letra mayúscula y un número
+      </div>
     </div>
-  </div>
 
   <!-- FECHA DE NACIMIENTO -->
+
   <div class="form-floating">
     <input type="date" class="form-control" id="floatingFechaNacimiento"
-           placeholder="Fecha de Nacimiento" formControlName="fechaNacimiento">
+          placeholder="Fecha de Nacimiento" formControlName="fechaNacimiento">
     <label for="floatingFechaNacimiento">Fecha de Nacimiento</label>
   </div>
+    </div>
+
 
   <!-- DESCRIPCIÓN -->
   <div class="form-floating">
@@ -69,7 +71,14 @@
               placeholder="Descripcion" formControlName="descripcion" style="height: 100px"></textarea>
     <label for="floatingDescripcion">Descripcion</label>
   </div>
-
+  <!-- IMAGEN DE PERFIL -->
+  <div class="form-floating">
+    <input type="file" accept="image/*" class="form-control"
+           id="floatingImagen" (change)="onFileSelected($event)">
+    <label for="floatingImagen">Imagen de perfil</label>
+    <div class="invalid-feedback">Debe subir una imagen válida</div>
+  </div>
+  
   <button class="btn btn-primary w-100 py-2" type="submit" [disabled]="!registroForm.valid">
     Registrarse
   </button>

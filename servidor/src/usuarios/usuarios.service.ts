@@ -43,4 +43,8 @@ export class UsuariosService {
   findByCorreo(correo: string) {
     return this.instModel.findOne({ correo });
   }
+
+  findByNombreUsuario(nombreUsuario: string) {
+    return this.instModel.findOne({ nombreUsuario });
+  }
 }

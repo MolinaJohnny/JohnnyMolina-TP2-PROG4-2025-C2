@@ -21,11 +21,9 @@ export class Login {
   enviarFormulario() {
     if (this.loginForm.valid) {
       const { nombreUsuario, password } = this.loginForm.value;
-      // Usar el endpoint cookie-based
       this.auth.loginCookie({ nombreUsuario: nombreUsuario ?? '', contrasena: password ?? '' }).subscribe({
         next: (respuesta: any) => {
           console.log('Login (cookie) respuesta:', respuesta);
-          // backend debe haber seteado la cookie; indicamos authState y navegamos
           this.auth.authState.next(true);
           this.router.navigate(['/publicaciones']);
         },
@@ -40,7 +38,6 @@ export class Login {
     }
   }
 
-  // Métodos de prueba opcionales
   logueo() {
     this.auth.loginCookie({ nombreUsuario: 'Fionas', contrasena: 'Fiona123' }).subscribe({
       next: (resp) => {

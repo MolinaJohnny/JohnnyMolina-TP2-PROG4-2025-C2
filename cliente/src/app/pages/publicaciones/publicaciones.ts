@@ -26,7 +26,6 @@ export class Publicaciones implements OnInit {
   authService = inject(Auth)
   route = inject(ActivatedRoute);
 
-  // Lista de publicaciones (se llenará con cargarPublicaciones)
   publicaciones: any[] = [];
 
   // Objeto para manejar filtros
@@ -40,7 +39,6 @@ export class Publicaciones implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    // Leer query params del router (ej: userId desde la barra de búsqueda del header)
     this.route.queryParams.subscribe((params) => {
       if (params['userId']) {
         this.filtros.userId = params['userId'];
@@ -50,7 +48,6 @@ export class Publicaciones implements OnInit {
   }
 
   cargarPublicaciones() {
-    // Construir objeto de opciones para enviar al servicio
     const opts: any = {
       sort: this.filtros.sort,
       offset: this.filtros.offset,
@@ -99,24 +96,12 @@ export class Publicaciones implements OnInit {
       this.publicacionesService.subirPublicacion(publicacion)
       // limpiar el formulario
       this.postForm.reset();
-      // Recargar publicaciones después de enviar
       this.cargarPublicaciones();
     } else {
       console.log('Formulario de publicación inválido');
     }
   }
 
-  eliminarPublicacion(id: string) {
-    // TODO: implementar eliminación
-    console.log('eliminarPublicacion', id);
-  }
-
-  editarPublicacion(pub: any) {
-    // TODO: implementar edición
-    console.log('editarPublicacion', pub);
-  }
-
-  // Ir a la página anterior
   paginaAnterior() {
     if (this.filtros.offset > 0) {
       this.filtros.offset -= this.filtros.limit;
@@ -124,7 +109,6 @@ export class Publicaciones implements OnInit {
     }
   }
 
-  // Ir a la página siguiente
   paginaSiguiente() {
     if (this.publicaciones.length === this.filtros.limit) {
       this.filtros.offset += this.filtros.limit;

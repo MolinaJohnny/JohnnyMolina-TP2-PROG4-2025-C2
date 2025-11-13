@@ -3,3 +3,6 @@ El token retornara en modo de cookie
 
 10/11
 Falta hacer ReFresh token y eliminar algunos metodos del modulo auth
+
+
+dudas: guardado de la cookie e inicio de sesion, relaciones de usuarios, problemas con el redireccionamiento

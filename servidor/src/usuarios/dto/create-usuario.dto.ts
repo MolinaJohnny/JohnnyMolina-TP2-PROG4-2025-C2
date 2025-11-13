@@ -21,12 +21,11 @@ export class CreateUsuarioDto {
   @IsString()
   @MinLength(8)
   contrasena: string;
-  // @IsNotEmpty()
-  // @IsDate()
-  // fechaNacimiento: Date;
+  @IsNotEmpty()
+  fechaNacimiento: Date;
   @IsString()
   descripcion: string;
-  @IsNotEmpty()
+
   imagenUrl: string;
   @IsString()
   perfil: string;

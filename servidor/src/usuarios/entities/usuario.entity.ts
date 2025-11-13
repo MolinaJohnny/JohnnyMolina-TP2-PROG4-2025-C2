@@ -1,4 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
+
 @Schema()
 export class Usuario {
   @Prop({ required: true })
@@ -16,8 +18,8 @@ export class Usuario {
   @Prop({ required: true })
   contrasena: string;
 
-  // @Prop({ required: true })
-  // fechaNacimiento: Date;
+  @Prop({ required: true })
+  fechaNacimiento: Date;
 
   @Prop({ required: true })
   descripcion: string;
@@ -25,9 +27,11 @@ export class Usuario {
   @Prop({ default: new Date() })
   fechaCreacion: Date;
 
-  @Prop({ required: true })
   imagenUrl: string;
 
   perfil: string;
+
+  @Prop({ type: [Types.ObjectId], ref: 'Publicacione', default: [] })
+  publicaciones: Types.ObjectId[];
 }
 export const UsuarioSchema = SchemaFactory.createForClass(Usuario);

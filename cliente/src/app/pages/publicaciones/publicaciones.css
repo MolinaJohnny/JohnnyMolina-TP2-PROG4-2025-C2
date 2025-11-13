@@ -1,0 +1,13 @@
+.scroll-container {
+  height: 80vh;     /* Ocupa toda la altura de la pantalla */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+.subir-publicacion{
+    width: 80%;
+}
+.publicacion-botones{
+    width: 5rem;
+}

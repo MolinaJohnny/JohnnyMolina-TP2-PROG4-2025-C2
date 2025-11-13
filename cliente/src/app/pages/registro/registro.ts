@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators, ValidationErrors } from '@angular/forms';
 import { NgIf } from '@angular/common';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-registro',
@@ -10,31 +11,65 @@ import { NgIf } from '@angular/common';
 })
 export class Registro {
   selectedFile: File | null = null;
+  imagenUrl: string = '';
 
   registroForm = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
+    nombre: new FormControl('', [Validators.required, Validators.minLength(2)]),
     apellido: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    edad : new FormControl('', [Validators.required, Validators.min(18), Validators.max(99)]),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(6), this.passwordFuerteValidator]),
-
+    correo: new FormControl('', [Validators.required, Validators.email]),
+    nombreUsuario: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    contrasena: new FormControl('', [Validators.required, Validators.minLength(8), this.passwordFuerteValidator]),
+    fechaNacimiento: new FormControl('', [Validators.required]),
+    descripcion: new FormControl(''),
+    imagenUrl: new FormControl(''),
+    perfil: new FormControl('usuario'),
   });
+
+  auth = inject(Auth);
   onFileSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0] || null;
     this.selectedFile = file;
-    console.log('Archivo seleccionado:', file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagenUrl = e.target.result;
+        this.registroForm.patchValue({ imagenUrl: this.imagenUrl });
+      };
+      reader.readAsDataURL(file);
+    }
   }
-  crearCuenta() {
 
+  crearCuenta() {
+    if (this.registroForm.valid) {
+      const form = this.registroForm.value;
+      
+
+      
+      const usuario = {
+        nombre: form.nombre ?? '',
+        apellido: form.apellido ?? '',
+        correo: form.correo ?? '',
+        nombreUsuario: form.nombreUsuario ?? '',
+        contrasena: form.contrasena ?? '',
+        fechaNacimiento: form.fechaNacimiento ?? '',
+        descripcion: form.descripcion ?? '',
+        imagenUrl: this.imagenUrl ?? "",
+        perfil: form.perfil ?? 'usuario',
+      };
+      
+      console.log('Datos a enviar:', usuario);
+      this.auth.register(usuario);
+    } else {
+      if (!this.selectedFile || !this.imagenUrl) {
+        alert('Por favor, selecciona una imagen de perfil');
+      } else {
+        console.log('Formulario no válido');
+      }
+    }
   }
 
   enviarFormulario() {
-    if (this.registroForm.valid) {
-      console.log(this.registroForm.value);
-    } else {
-      console.log('Formulario no válido');
-    }
-    
+    this.crearCuenta();
   }
   validarEmail(control: AbstractControl) : ValidationErrors | null {
     const error = {iguales : false};

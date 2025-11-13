@@ -57,13 +57,25 @@
     </div>
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
         <header class="mb-auto">
-            <div>
-                <h3 class="float-md-start mb-0">Cover</h3>
-                <nav class="nav nav-masthead justify-content-center float-md-end"> 
-						<button class="nav-link fw-bold py-1 px-0 active" routerLink="publicaciones">Publicaciones</button>
-						<button class="nav-link fw-bold py-1 px-0" routerLink="login"> Login</button>
-						<button class="nav-link fw-bold py-1 px-0" routerLink="registro"> Registro</button>
-						<button class="nav-link fw-bold py-1 px-0" routerLink="mi-perfil"> Mi perfil</button> </nav>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h3 class="mb-0">Cover</h3>
+                <!-- Barra de búsqueda por usuario (centrada) -->
+                <div class="flex-grow-1 mx-4">
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        placeholder="Buscar por usuario..." 
+                        (keyup.enter)="filtrarPorUsuario()">
+                </div>
+                <nav class="nav nav-masthead">
+                    <button class="nav-link fw-bold py-1 px-0 active" routerLink="publicaciones">Publicaciones</button>
+                    <!-- Mostrar Login y Registro sólo si NO está autenticado -->
+                    <button *ngIf="!isAuthenticated()" class="nav-link fw-bold py-1 px-0" routerLink="login"> Login</button>
+                    <button *ngIf="!isAuthenticated()" class="nav-link fw-bold py-1 px-0" routerLink="registro"> Registro</button>
+                    <!-- Mostrar Cerrar sesión cuando está autenticado (en la misma posición donde estaba Registro) -->
+                    <button *ngIf="isAuthenticated()" class="nav-link fw-bold py-1 px-0" type="button" (click)="logout()">Cerrar sesión</button>
+                    <button class="nav-link fw-bold py-1 px-0" routerLink="mi-perfil"> Mi perfil</button>
+                </nav>
             </div>
         </header>
 		<main class="px-3">

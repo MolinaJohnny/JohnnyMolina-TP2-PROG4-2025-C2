@@ -23,6 +23,9 @@ export class Publicacione {
 
   @Prop()
   fechaEliminacion: Date;
+
+  @Prop({ type: [String], default: [] })
+  likes: string[];
 }
 
 export const PublicacioneSchema = SchemaFactory.createForClass(Publicacione);

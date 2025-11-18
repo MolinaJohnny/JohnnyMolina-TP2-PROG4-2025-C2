@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { PublicacionesService } from '../../services/publicaciones-service';
@@ -8,7 +8,7 @@ import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-publicaciones',
-  imports: [ReactiveFormsModule, NgFor, NgIf, FormsModule],
+  imports: [ReactiveFormsModule, NgFor, NgIf, FormsModule, NgClass],
   templateUrl: './publicaciones.html',
   styleUrl: './publicaciones.css',
 })
@@ -136,5 +136,30 @@ export class Publicaciones implements OnInit {
       this.filtros.offset += this.filtros.limit;
       this.cargarPublicaciones();
     }
+  }
+    likes = 0;
+  likeado = false;
+
+  async likear(pub: any) {
+    const usuario = await this.authService.dataCookie();
+    const nombreUsuario = usuario.resultado['usuario'].nombreUsuario;
+
+    this.publicacionesService.toggleLike(pub._id).subscribe({
+      next: (res: any) => {
+        // actualiza el numero de likes
+        pub.likesCantidad = res.likes;
+
+        // marca si ya está likeado
+        pub.likeado = res.likeado;
+
+        // si querés actualizar el array completo de likes:
+        if (res.likeado) {
+          pub.likes.push(nombreUsuario);
+        } else {
+          pub.likes = pub.likes.filter((id: string) => id !== nombreUsuario);
+        }
+      },
+      error: (err) => console.error("Error al dar like:", err)
+    });
   }
 }

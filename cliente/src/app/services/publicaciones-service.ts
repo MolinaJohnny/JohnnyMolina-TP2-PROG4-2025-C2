@@ -17,22 +17,6 @@ subirPublicacion(formData: FormData) {
     }
   );
 }
-  register(usuario: any) {
-    console.log('Enviando registro con datos:', usuario);
-    const peticion = this.httpClient.post(
-      `${environment.apiUrl}/auth/register`,
-      usuario,
-      {
-        // credentials: 'include',
-      }
-    );
-    
-    peticion.subscribe((respuesta) => {
-      console.log('Registro exitoso:', respuesta);
-    }, (error) => {
-      console.error('Error en el registro:', error);
-    });
-  }
   obtenerPublicaciones(opts?: { sort?: string; userId?: string; offset?: number; limit?: number }) {
     let params = new HttpParams();
     if (opts?.sort) params = params.set('sort', opts.sort);
@@ -41,5 +25,8 @@ subirPublicacion(formData: FormData) {
     if (opts?.limit != null) params = params.set('limit', String(opts.limit));
 
     return this.httpClient.get(`${environment.apiUrl}/publicaciones/todas`, { params });
+  }
+  toggleLike(idPublcicacion: string){
+    return this.httpClient.post(`${environment.apiUrl}/publicaciones/${idPublcicacion}/like`,{})
   }
 }

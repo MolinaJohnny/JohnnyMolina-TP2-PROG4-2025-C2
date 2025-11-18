@@ -1,4 +1,3 @@
-import type { Request } from 'express';
 import {
   Controller,
   Get,
@@ -12,11 +11,14 @@ import {
   BadRequestException,
   ParseFilePipe,
   MaxFileSizeValidator,
+  UseGuards,
 } from '@nestjs/common';
 import { PublicacionesService } from './publicaciones.service';
 import { CreatePublicacioneDto } from './dto/create-publicacione.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { JwtCookieGuard } from 'src/guards/jwt-cookie/jwt-cookie.guard';
+import type { Request } from 'express';
 @Controller('publicaciones')
 export class PublicacionesController {
   constructor(private readonly publicacionesService: PublicacionesService) {}
@@ -80,8 +82,14 @@ export class PublicacionesController {
     const usuarioId = String(usuarioData?.id || usuarioData?._id);
     return this.publicacionesService.reactivate(id, usuarioId);
   }
+  @Post(':id/like')
+  @UseGuards(JwtCookieGuard)
+  toggleLike(@Param('id') id: string, @Req() req: Request) {
+    console.log('REQ.USER DESDE COOKIE GUARD:', req.user);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+    return this.publicacionesService.toggleLike(id, req.user.nombreUsuario);
+  }
   //Post de comentario
   //Put de comentario
-  //Guard de validar logueo
 }

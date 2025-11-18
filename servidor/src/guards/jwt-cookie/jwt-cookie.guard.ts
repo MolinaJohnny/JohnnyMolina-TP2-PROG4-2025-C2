@@ -1,13 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   CanActivate,
   ExecutionContext,
-  HttpException,
   Injectable,
   UnauthorizedException,
+  HttpException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { JsonWebTokenError, TokenExpiredError, verify } from 'jsonwebtoken';
+import {
+  verify,
+  decode,
+  TokenExpiredError,
+  JsonWebTokenError,
+} from 'jsonwebtoken';
 
 @Injectable()
 export class JwtCookieGuard implements CanActivate {
@@ -15,28 +22,36 @@ export class JwtCookieGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request: Request = context.switchToHttp().getRequest();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const token = request.cookies['token'];
+    const token = request.cookies?.token;
 
     if (!token) {
       throw new UnauthorizedException('No hay token en la cookie');
     }
 
-    // 🔥 Se obtiene la contraseña del .env
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const secret = this.configService.get<any>('CONTRASENA_SEGURA');
+    const secret = this.configService.get<string>('CONTRASENA_SEGURA');
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      verify(token, secret);
+      // 1. Verifica firma (importante)
+      verify(token, secret!);
+
+      // 2. Decodifica contenido (no vuelve a verificar)
+      const payload: any = decode(token);
+
+      // 3. Adaptar las propiedades al formato esperado por tu backend
+      request.user = {
+        nombreUsuario: payload.user, // <-- Mapea "user" a "nombreUsuario"
+        imagenUrl: payload.Url, // <-- Mapea "Url" a "imagenUrl"
+        descripcion: payload.descripcion,
+        ...payload, // <-- por si hay más datos
+      };
+
       return true;
     } catch (error) {
       if (error instanceof TokenExpiredError) {
         throw new HttpException('Token expirado', 401);
       }
-
       if (error instanceof JsonWebTokenError) {
-        throw new HttpException('Firma falló o token modificado', 401);
+        throw new HttpException('Token inválido o manipulado', 401);
       }
 
       throw new UnauthorizedException('Token inválido');

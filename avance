@@ -1,8 +1,4 @@
-9/11
-El token retornara en modo de cookie
 
-10/11
-Falta hacer ReFresh token y eliminar algunos metodos del modulo auth
-
-
-dudas: guardado de la cookie e inicio de sesion, relaciones de usuarios, problemas con el redireccionamiento
+como hacer lo del usuario/admin
+problemas con el temporizador del token
+el inicio debe ser con user o con gmail? o debe ser ambos

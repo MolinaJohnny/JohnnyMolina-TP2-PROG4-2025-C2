@@ -150,4 +150,28 @@ export class PublicacionesService {
 
     return resultado;
   }
+  async toggleLike(publicacionId: string, nombreUsuario: string) {
+    const publicacion = await this.instModel.findById(publicacionId);
+
+    if (!publicacion) {
+      throw new NotFoundException('Publicacion no encontrada');
+    }
+
+    const yaLikeo = publicacion.likes.includes(nombreUsuario);
+
+    if (yaLikeo) {
+      publicacion.likes = publicacion.likes.filter(
+        (id) => id !== nombreUsuario,
+      );
+    } else {
+      publicacion.likes.push(nombreUsuario);
+    }
+
+    await publicacion.save();
+
+    return {
+      likes: publicacion.likes.length,
+      likeado: !yaLikeo,
+    };
+  }
 }

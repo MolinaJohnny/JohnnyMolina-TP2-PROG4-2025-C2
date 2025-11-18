@@ -63,8 +63,14 @@
 
         <div class="d-flex flex-column gap-2 publicacion-botones">
           <button class="btn btn-sm btn-outline-secondary" >Ver</button>
-          <button class="btn btn-sm btn-outline-danger" >Like</button>
-        </div>
+          <button 
+            (click)="likear(pub)"
+            [ngClass]="pub.likeado ? 'btn btn-primary' : 'btn btn-outline-primary'"
+          >
+            👍 {{ pub.likes?.length || 0 }}
+          </button>
+              
+      </div>
       </div>
     </div>
 
@@ -80,7 +86,7 @@
     Página {{ (filtros.offset / filtros.limit) + 1 }}
   </span>
 
-  <button class="btn btn-outline-primary" (click)="paginaSiguiente()" [disabled]="publicaciones.length < filtros.limit">
+  <button class="btn btn-outline-primary" (click)="paginaSiguiente()" [disabled]="publicaciones.length">
     Siguiente →
   </button>
 </div>

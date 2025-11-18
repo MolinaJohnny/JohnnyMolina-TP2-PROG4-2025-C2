@@ -13,23 +13,24 @@ export class App {
   protected readonly title = signal('cliente');
   auth = inject(Auth);
   router = inject(Router);
-  isAuthenticated = signal<boolean>(!!localStorage.getItem('token'));
+
+  isAuthenticated = this.auth.authState;
 
   constructor() {
-    this.auth.checkAuth()
+    this.auth.checkAuth();
   }
 
   logout() {
     this.auth.logout().subscribe({
       next: () => {
-        this.auth.authState.next(false);
-        this.router.navigate(['/publicaciones']);
+        this.auth.clearToken();
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         console.error('Error cerrando sesión en backend', err);
         this.auth.clearToken();
-        this.auth.authState.next(false);
-        this.router.navigate(['/publicaciones']);
+        this.auth.authState.set(false);
+
       }
     });
   }

@@ -13,13 +13,19 @@ import {
 } from 'jsonwebtoken';
 import { CreateUsuarioDto } from 'src/usuarios/dto/create-usuario.dto';
 import * as bcrypt from 'bcrypt';
-const contrasenaSecreta = 'securePassword123';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
+  private readonly contrasenaSecreta: any;
+
   constructor(
+    private configService: ConfigService,
     private readonly usuariosService: UsuariosService,
     // private readonly jwtService: JwtService,
-  ) {}
+  ) {
+    this.contrasenaSecreta =
+      this.configService.get<string>('CONTRASENA_SEGURA');
+  }
   async register(user: CreateUsuarioDto) {
     const nuevoUsuario = await this.usuariosService.create(user);
 
@@ -34,7 +40,7 @@ export class AuthService {
     if (tipo !== 'Bearer')
       throw new BadRequestException('Tipo de token no válido');
     try {
-      const tokenValidado = verify(token, contrasenaSecreta);
+      const tokenValidado = verify(token, this.contrasenaSecreta);
       return tokenValidado;
     } catch (error) {
       if (error instanceof TokenExpiredError) {
@@ -51,7 +57,7 @@ export class AuthService {
       user: userName,
       admin: false,
     };
-    const token: string = sign(payload, contrasenaSecreta, {
+    const token: string = sign(payload, this.contrasenaSecreta, {
       expiresIn: '15m',
     });
     return token;
@@ -97,7 +103,7 @@ export class AuthService {
 
   verificarDesdeCookie(token: string) {
     try {
-      const tokenValidado = verify(token, contrasenaSecreta);
+      const tokenValidado = verify(token, this.contrasenaSecreta);
       return tokenValidado;
     } catch (error) {
       if (error instanceof TokenExpiredError) {

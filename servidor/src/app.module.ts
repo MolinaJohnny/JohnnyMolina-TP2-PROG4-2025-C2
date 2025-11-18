@@ -13,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
     PublicacionesModule,
     AuthModule,
     UsuariosModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGODB_URI!),
   ],
   controllers: [AppController, ComentariosController],

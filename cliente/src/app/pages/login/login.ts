@@ -24,13 +24,13 @@ export class Login {
       this.auth.loginCookie({ nombreUsuario: nombreUsuario ?? '', contrasena: password ?? '' }).subscribe({
         next: (respuesta: any) => {
           console.log('Login (cookie) respuesta:', respuesta);
-          this.auth.authState.next(true);
+          this.auth.authState.set(true);
           this.router.navigate(['/publicaciones']);
         },
         error: (err) => {
           console.error('Error en login cookie:', err);
           alert('Error al iniciar sesión');
-          this.auth.authState.next(false);
+          this.auth.authState.set(false);
         }
       });
     } else {
@@ -42,12 +42,12 @@ export class Login {
     this.auth.loginCookie({ nombreUsuario: 'Fionas', contrasena: 'Fiona123' }).subscribe({
       next: (resp) => {
         console.log('logueo test ok', resp);
-        this.auth.authState.next(true);
+        this.auth.authState.set(true);
         this.router.navigate(['/publicaciones']);
       },
       error: (err) => {
         console.error('logueo test err', err);
-        this.auth.authState.next(false);
+        this.auth.authState.set(false);
       }
     });
   }

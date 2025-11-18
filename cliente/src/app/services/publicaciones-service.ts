@@ -1,16 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../environments/environment.development';
 @Injectable({
   providedIn: 'root',
 })
 export class PublicacionesService {
   httpClient = inject(HttpClient);
-  apiUrl = 'http://localhost:3000';
 
 
   subirPublicacion(publicacion: any) {
     const peticion = this.httpClient.post(
-      this.apiUrl + '/publicaciones/subir',
+      `${environment.apiUrl}/publicaciones/subir`,
       publicacion, {
       // credentials: 'include',
       }
@@ -24,7 +24,7 @@ export class PublicacionesService {
   register(usuario: any) {
     console.log('Enviando registro con datos:', usuario);
     const peticion = this.httpClient.post(
-      this.apiUrl + '/auth/register',
+      `${environment.apiUrl} /auth/register`,
       usuario,
       {
         // credentials: 'include',
@@ -44,6 +44,6 @@ export class PublicacionesService {
     if (opts?.offset != null) params = params.set('offset', String(opts.offset));
     if (opts?.limit != null) params = params.set('limit', String(opts.limit));
 
-    return this.httpClient.get(this.apiUrl + '/publicaciones/todas', { params });
+    return this.httpClient.get(`${environment.apiUrl}  /publicaciones/todas`, { params });
   }
 }

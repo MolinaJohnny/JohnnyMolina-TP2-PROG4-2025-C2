@@ -7,6 +7,8 @@ import {
   Res,
   Req,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUsuarioDto } from 'src/usuarios/dto/create-usuario.dto';
@@ -14,15 +16,20 @@ import type { Response, Request } from 'express';
 import { decode } from 'jsonwebtoken';
 import { LoginDto } from './dto/credenciales.dto';
 import { JwtCookieGuard } from 'src/guards/jwt-cookie/jwt-cookie.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-  // constructor(private readonly usuariosService: UsuariosService) {}
   @Post('register')
+  @UseInterceptors(FileInterceptor('imagenUrl', { dest: 'public/images' }))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+  }
   register(@Body() body: CreateUsuarioDto) {
     const token = this.authService.register(body);
     return { token };
   }
+
   @Post('login/cookie')
   async loginCookie(
     @Body() body: LoginDto,

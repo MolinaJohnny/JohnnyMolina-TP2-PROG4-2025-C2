@@ -15,7 +15,6 @@ export const redirectInterceptor: HttpInterceptorFn = (req, next) => {
       if (err.status === 401) {
         console.log('Podría redirigir a algun lado...');
         router.navigate(['/login']); 
-
       }
       return throwError(() => err);
     })

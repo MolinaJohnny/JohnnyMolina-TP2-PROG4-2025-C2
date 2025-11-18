@@ -27,6 +27,7 @@ export class Usuario {
   @Prop({ default: new Date() })
   fechaCreacion: Date;
 
+  @Prop()
   imagenUrl: string;
 
   perfil: string;

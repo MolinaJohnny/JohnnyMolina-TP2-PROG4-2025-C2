@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Controller,
   Post,
@@ -9,6 +11,9 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUsuarioDto } from 'src/usuarios/dto/create-usuario.dto';
@@ -17,15 +22,37 @@ import { decode } from 'jsonwebtoken';
 import { LoginDto } from './dto/credenciales.dto';
 import { JwtCookieGuard } from 'src/guards/jwt-cookie/jwt-cookie.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('register')
-  @UseInterceptors(FileInterceptor('imagenUrl', { dest: 'public/images' }))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-  }
-  register(@Body() body: CreateUsuarioDto) {
+  @UseInterceptors(
+    FileInterceptor('imagenUrl', {
+      storage: diskStorage({
+        destination(req, file, callback) {
+          callback(null, 'public/images/users'); // carpeta donde se guarda
+        },
+        filename(req, file, callback) {
+          const nuevoNombre = `${Date.now()}-${file.originalname}`;
+          callback(null, nuevoNombre);
+        },
+      }),
+    }),
+  )
+  register(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 4000000 })],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body() body: CreateUsuarioDto,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No se ha subido ninguna imagen');
+    }
+    body.imagenUrl = `/images/users/${file.filename}`;
     const token = this.authService.register(body);
     return { token };
   }
@@ -58,7 +85,18 @@ export class AuthController {
   @Get('data/jwt/cookie')
   traerConGuardYCookie(@Req() request: Request) {
     const token = request.cookies['token'] as string;
-    const datos = decode(token);
-    return datos;
+    const datos: any = decode(token);
+    console.log(datos);
+
+    return {
+      resultado: {
+        token,
+        usuario: {
+          nombreUsuario: datos.user,
+          urlImagen: datos.Url,
+          descripcion: datos.descripcion,
+        },
+      },
+    };
   }
 }

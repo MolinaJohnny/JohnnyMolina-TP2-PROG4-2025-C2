@@ -29,7 +29,11 @@ export class AuthService {
   async register(user: CreateUsuarioDto) {
     const nuevoUsuario = await this.usuariosService.create(user);
 
-    return this.guardarEnCookie(nuevoUsuario.nombreUsuario);
+    return this.guardarEnCookie(
+      nuevoUsuario.nombreUsuario,
+      nuevoUsuario.imagenUrl,
+      nuevoUsuario.descripcion,
+    );
   }
 
   verificar(authHeader: string) {
@@ -52,9 +56,16 @@ export class AuthService {
       throw new InternalServerErrorException('');
     }
   }
-  guardarEnCookie(userName: string) {
-    const payload: { user: string; admin: boolean } = {
+  guardarEnCookie(userName: string, imagenUrl: string, descripcion: string) {
+    const payload: {
+      user: string;
+      admin: boolean;
+      Url: string;
+      descripcion: string;
+    } = {
       user: userName,
+      Url: imagenUrl,
+      descripcion: descripcion,
       admin: false,
     };
     const token: string = sign(payload, this.contrasenaSecreta, {
@@ -82,7 +93,11 @@ export class AuthService {
     }
 
     // Generar token
-    const token = this.guardarEnCookie(usuario.nombreUsuario);
+    const token = this.guardarEnCookie(
+      usuario.nombreUsuario,
+      usuario.imagenUrl,
+      usuario.descripcion,
+    );
 
     // Devolver token y datos del usuario
     return {

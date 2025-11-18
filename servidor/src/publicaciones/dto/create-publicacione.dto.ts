@@ -7,7 +7,7 @@ export class CreatePublicacioneDto {
   @IsNotEmpty()
   descripcion: string;
 
-  urlImagen: string;
+  urlImagen?: string;
 
   @IsString()
   @IsNotEmpty()

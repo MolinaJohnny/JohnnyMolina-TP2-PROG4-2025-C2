@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
@@ -8,23 +8,19 @@ export class PublicacionesService {
   httpClient = inject(HttpClient);
 
 
-  subirPublicacion(publicacion: any) {
-    const peticion = this.httpClient.post(
-      `${environment.apiUrl}/publicaciones/subir`,
-      publicacion, {
-      // credentials: 'include',
-      }
-    );
-    peticion.subscribe((respuesta) => {
-      console.log('Publicacion subida: ', respuesta);
-      }, (error) => {
-        console.error('Error en el front al subir: ', error)
-      })
-  }
+subirPublicacion(formData: FormData) {
+  return this.httpClient.post(
+    `${environment.apiUrl}/publicaciones/subir`,
+    formData,
+    {
+      withCredentials: true 
+    }
+  );
+}
   register(usuario: any) {
     console.log('Enviando registro con datos:', usuario);
     const peticion = this.httpClient.post(
-      `${environment.apiUrl} /auth/register`,
+      `${environment.apiUrl}/auth/register`,
       usuario,
       {
         // credentials: 'include',
@@ -44,6 +40,6 @@ export class PublicacionesService {
     if (opts?.offset != null) params = params.set('offset', String(opts.offset));
     if (opts?.limit != null) params = params.set('limit', String(opts.limit));
 
-    return this.httpClient.get(`${environment.apiUrl}  /publicaciones/todas`, { params });
+    return this.httpClient.get(`${environment.apiUrl}/publicaciones/todas`, { params });
   }
 }

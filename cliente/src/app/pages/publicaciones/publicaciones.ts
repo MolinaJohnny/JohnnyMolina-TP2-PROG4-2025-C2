@@ -3,8 +3,9 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import {  PublicacionesService } from '../../services/publicaciones-service';
-import { Auth } from '../../services/auth'
+import { PublicacionesService } from '../../services/publicaciones-service';
+import { Auth } from '../../services/auth';
+
 @Component({
   selector: 'app-publicaciones',
   imports: [ReactiveFormsModule, NgFor, NgIf, FormsModule],
@@ -12,23 +13,19 @@ import { Auth } from '../../services/auth'
   styleUrl: './publicaciones.css',
 })
 export class Publicaciones implements OnInit {
-  
-  
-  // Form para crear una nueva publicacion
 
   postForm = new FormGroup({
     titulo: new FormControl('', [Validators.required]),
     contenido: new FormControl('', [Validators.required, Validators.minLength(1)]),
   });
 
-
   publicacionesService = inject(PublicacionesService);
-  authService = inject(Auth)
+  authService = inject(Auth);
   route = inject(ActivatedRoute);
 
   publicaciones: any[] = [];
+  imagenSeleccionada: File | null = null;
 
-  // Objeto para manejar filtros
   filtros = {
     sort: 'date',
     userId: '',
@@ -45,6 +42,13 @@ export class Publicaciones implements OnInit {
       }
       this.cargarPublicaciones();
     });
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+    this.imagenSeleccionada = file;
+    console.log("Imagen seleccionada:", file);
   }
 
   cargarPublicaciones() {
@@ -66,7 +70,7 @@ export class Publicaciones implements OnInit {
       error: (err) => {
         console.error('Error cargando publicaciones:', err);
         this.publicaciones = [];
-      }
+      },
     });
   }
 
@@ -84,22 +88,40 @@ export class Publicaciones implements OnInit {
   }
 
   async enviarPublicacion() {
-    if (this.postForm.valid) {
-      const usuario = await this.authService.dataCookie()
-      const form = this.postForm.value;
-      const publicacion = {
-        titulo: form.titulo ?? '',
-        descripcion: form.contenido ?? '',
-        usuario: usuario.user,
-        
-      }
-      this.publicacionesService.subirPublicacion(publicacion)
-      // limpiar el formulario
-      this.postForm.reset();
-      this.cargarPublicaciones();
-    } else {
-      console.log('Formulario de publicación inválido');
+    if (this.postForm.invalid) {
+      console.log('Formulario inválido');
+      return;
     }
+
+    if (!this.imagenSeleccionada) {
+      console.log('Debes seleccionar una imagen');
+      return;
+    }
+
+    const usuario = await this.authService.dataCookie();
+    const form = this.postForm.value;
+
+    const formData = new FormData();
+    formData.append('titulo', form.titulo ?? '');
+    formData.append('descripcion', form.contenido ?? '');
+    formData.append('usuario', usuario.resultado['usuario'].nombreUsuario);
+    formData.append('urlImagen', this.imagenSeleccionada); 
+
+    this.publicacionesService.subirPublicacion(formData).subscribe({
+      next: () => {
+        console.log('Publicación subida con éxito');
+
+        // Reset form y file
+        this.postForm.reset();
+        this.imagenSeleccionada = null;
+
+        // Recargar publicaciones
+        this.cargarPublicaciones();
+      },
+      error: (err) => {
+        console.error('Error al subir publicación:', err);
+      },
+    });
   }
 
   paginaAnterior() {
@@ -116,4 +138,3 @@ export class Publicaciones implements OnInit {
     }
   }
 }
-

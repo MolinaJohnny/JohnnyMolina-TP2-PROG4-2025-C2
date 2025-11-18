@@ -26,47 +26,34 @@ export class Registro {
   });
 
   auth = inject(Auth);
-  onFileSelected(event: Event) {
-    const file = (event.target as HTMLInputElement).files?.[0] || null;
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
     this.selectedFile = file;
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.imagenUrl = e.target.result;
-        this.registroForm.patchValue({ imagenUrl: this.imagenUrl });
-      };
-      reader.readAsDataURL(file);
-    }
+    console.log("Imagen seleccionada:", file);
   }
 
   crearCuenta() {
-    if (this.registroForm.valid) {
-      const form = this.registroForm.value;
-      
+  if (this.registroForm.valid && this.selectedFile) {
 
-      
-      const usuario = {
-        nombre: form.nombre ?? '',
-        apellido: form.apellido ?? '',
-        correo: form.correo ?? '',
-        nombreUsuario: form.nombreUsuario ?? '',
-        contrasena: form.contrasena ?? '',
-        fechaNacimiento: form.fechaNacimiento ?? '',
-        descripcion: form.descripcion ?? '',
-        imagenUrl: this.imagenUrl ?? "",
-        perfil: form.perfil ?? 'usuario',
-      };
-      
-      console.log('Datos a enviar:', usuario);
-      this.auth.register(usuario);
-    } else {
-      if (!this.selectedFile || !this.imagenUrl) {
-        alert('Por favor, selecciona una imagen de perfil');
-      } else {
-        console.log('Formulario no válido');
-      }
-    }
+    const formData = new FormData();
+
+    formData.append('nombre', this.registroForm.value.nombre || '');
+    formData.append('apellido', this.registroForm.value.apellido || '');
+    formData.append('correo', this.registroForm.value.correo || '');
+    formData.append('nombreUsuario', this.registroForm.value.nombreUsuario || '');
+    formData.append('contrasena', this.registroForm.value.contrasena || '');
+    formData.append('fechaNacimiento', this.registroForm.value.fechaNacimiento || '');
+    formData.append('descripcion', this.registroForm.value.descripcion || '');
+    formData.append('perfil', this.registroForm.value.perfil || 'usuario');
+
+    formData.append('imagenUrl', this.selectedFile);
+
+    this.auth.register(formData);
+  } else {
+    alert('Completa todos los campos e incluye una imagen');
   }
+}
 
   enviarFormulario() {
     this.crearCuenta();

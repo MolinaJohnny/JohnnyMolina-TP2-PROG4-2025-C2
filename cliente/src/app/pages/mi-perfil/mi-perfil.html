@@ -1,1 +1,16 @@
-<p>mi-perfil works!</p>
+<div class="perfil-container">
+  <div class="card perfil-card">
+    
+    <!-- Foto de perfil -->
+    <div class="foto-container">
+      <img [src]="usuario.foto" alt="Foto de perfil" class="foto-perfil">
+    </div>
+
+    <!-- Nombre -->
+    <h2 class="nombre">{{ usuario.nombre }}</h2>
+
+    <!-- Descripción -->
+    <p class="descripcion">{{ usuario.descripcion }}</p>
+
+  </div>
+</div>

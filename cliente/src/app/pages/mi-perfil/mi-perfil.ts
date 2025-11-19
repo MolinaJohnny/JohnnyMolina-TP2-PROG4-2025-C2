@@ -1,5 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Auth } from '../../services/auth';
+import { environment } from '../../../environments/environment';
+
 @Component({
   selector: 'app-mi-perfil',
   imports: [],
@@ -22,7 +24,7 @@ export class MiPerfil implements OnInit {
     console.log(userActual.resultado.usuario.urlImagen) 
     this.usuario = {
       nombre: userActual.resultado.usuario.nombreUsuario,
-      foto: backendUrl+userActual.resultado.usuario.urlImagen,
+      foto: environment.apiUrl+userActual.resultado.usuario.urlImagen,
 
       descripcion: 'Desarrollador web apasionado por Angular y tecnologías modernas.'
     };

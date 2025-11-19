@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { PublicacionesService } from '../../services/publicaciones-service';
 import { Auth } from '../../services/auth';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-publicaciones',
@@ -25,6 +26,7 @@ export class Publicaciones implements OnInit {
 
   publicaciones: any[] = [];
   imagenSeleccionada: File | null = null;
+  nuevoComentario: string = '';
 
   filtros = {
     sort: 'date',
@@ -32,6 +34,43 @@ export class Publicaciones implements OnInit {
     offset: 0,
     limit: 10,
   };
+  modalAbierto = false;
+  publicacionSeleccionada: any = null;
+  rutaImagen: string = "";
+  abrirModal(pub: any) {
+    this.publicacionSeleccionada = pub;
+    this.modalAbierto = true;
+    this.rutaImagen = environment.apiUrl+this.publicacionSeleccionada.urlImagen
+    console.log(this.publicacionSeleccionada.urlImagen)
+    this.publicacionesService.obtenerComentarios(pub._id).subscribe({
+      next: (comentarios: any[]) => {
+        this.publicacionSeleccionada.comentarios = comentarios;
+      },
+      error: (err) => console.error("Error cargando comentarios:", err)
+    });
+  }
+
+  cerrarModal(event?: Event) {
+    if (event) event.stopPropagation();
+    this.modalAbierto = false;
+    this.publicacionSeleccionada = null;
+  }
+  agregarComentario() {
+    if (!this.nuevoComentario.trim()) return;
+
+    this.publicacionesService
+      .agregarComentario(this.publicacionSeleccionada._id, this.nuevoComentario)
+      .subscribe({
+        next: (comentario: any) => {
+          if (!this.publicacionSeleccionada.comentarios) {
+            this.publicacionSeleccionada.comentarios = [];
+          }
+          this.publicacionSeleccionada.comentarios.unshift(comentario);
+          this.nuevoComentario = '';
+        },
+        error: (err) => console.error("Error agregando comentario:", err)
+      });
+  }
 
   constructor() {}
 

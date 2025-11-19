@@ -6,11 +6,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   Publicacione,
   PublicacioneSchema,
+  ComentarioSchema,
+  Comentario,
 } from './entities/publicacione.entity';
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Publicacione.name, schema: PublicacioneSchema },
+      { name: Comentario.name, schema: ComentarioSchema },
     ]),
   ],
   controllers: [PublicacionesController, ComentariosController],

@@ -4,16 +4,18 @@ import {
   ForbiddenException,
   NotFoundException,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreatePublicacioneDto } from './dto/create-publicacione.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Publicacione } from './entities/publicacione.entity';
+import { Comentario, Publicacione } from './entities/publicacione.entity';
 
 @Injectable()
 export class PublicacionesService {
   constructor(
     @InjectModel(Publicacione.name) private instModel: Model<Publicacione>,
+    @InjectModel(Comentario.name) private comentarioModel: Model<Comentario>,
   ) {}
 
   async create(createPublicacioneDto: CreatePublicacioneDto) {
@@ -173,5 +175,42 @@ export class PublicacionesService {
       likes: publicacion.likes.length,
       likeado: !yaLikeo,
     };
+  }
+  //                            Seccion Comentario
+  async agregarComentario(
+    publicacionId: string,
+    nombreUsuario: string,
+    contenido: string,
+  ) {
+    const publicacion = await this.instModel.findById(publicacionId);
+    if (!publicacion) throw new NotFoundException('Publicación no encontrada');
+
+    const comentario = await this.comentarioModel.create({
+      contenido,
+      usuario: nombreUsuario,
+      publicacion: publicacionId,
+    });
+
+    publicacion.comentarios.push(comentario._id);
+    await publicacion.save();
+
+    return comentario;
+  }
+  async obtenerComentarios(publicacionId: string) {
+    return this.comentarioModel
+      .find({ publicacion: publicacionId })
+      .populate('usuario', 'nombreUsuario imagenUrl')
+      .sort({ createdAt: -1 });
+  }
+  async eliminarComentario(comentarioId: string, nombreUsuario: string) {
+    const comentario = await this.comentarioModel.findById(comentarioId);
+    if (!comentario) throw new NotFoundException('Comentario no encontrado');
+
+    if (comentario.usuario.toString() !== nombreUsuario)
+      throw new UnauthorizedException('No puedes eliminar este comentario');
+
+    await this.comentarioModel.deleteOne({ _id: comentarioId });
+
+    return { ok: true };
   }
 }

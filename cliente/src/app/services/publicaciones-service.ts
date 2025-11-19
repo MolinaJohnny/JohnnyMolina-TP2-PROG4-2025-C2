@@ -8,15 +8,15 @@ export class PublicacionesService {
   httpClient = inject(HttpClient);
 
 
-subirPublicacion(formData: FormData) {
-  return this.httpClient.post(
-    `${environment.apiUrl}/publicaciones/subir`,
-    formData,
-    {
-      withCredentials: true 
-    }
-  );
-}
+  subirPublicacion(formData: FormData) {
+    return this.httpClient.post(
+      `${environment.apiUrl}/publicaciones/subir`,
+      formData,
+      {
+        withCredentials: true 
+      }
+    );
+  }
   obtenerPublicaciones(opts?: { sort?: string; userId?: string; offset?: number; limit?: number }) {
     let params = new HttpParams();
     if (opts?.sort) params = params.set('sort', opts.sort);
@@ -28,5 +28,12 @@ subirPublicacion(formData: FormData) {
   }
   toggleLike(idPublcicacion: string){
     return this.httpClient.post(`${environment.apiUrl}/publicaciones/${idPublcicacion}/like`,{})
+  }
+  //                               SECCION COMENTARIOS
+  obtenerComentarios(publicacionId: string) {
+    return this.httpClient.get<any[]>(`${environment.apiUrl}/publicaciones/${publicacionId}/comentarios`);
+  }
+  agregarComentario(publicacionId: string, contenido: string) {
+    return this.httpClient.post<any>(`${environment.apiUrl}/publicaciones/${publicacionId}/comentarios`, { contenido });
   }
 }

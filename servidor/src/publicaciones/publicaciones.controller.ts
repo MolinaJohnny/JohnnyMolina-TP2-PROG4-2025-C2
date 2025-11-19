@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Controller,
   Get,
@@ -85,11 +86,38 @@ export class PublicacionesController {
   @Post(':id/like')
   @UseGuards(JwtCookieGuard)
   toggleLike(@Param('id') id: string, @Req() req: Request) {
-    console.log('REQ.USER DESDE COOKIE GUARD:', req.user);
-
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     return this.publicacionesService.toggleLike(id, req.user.nombreUsuario);
   }
+
+  //                 SECCION COMENTARIOS
   //Post de comentario
+  @UseGuards(JwtCookieGuard)
+  @Post('/:id/comentarios')
+  crearComentario(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Body('contenido') contenido: string,
+  ) {
+    return this.publicacionesService.agregarComentario(
+      id,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+      req.user.nombreUsuario,
+      contenido,
+    );
+  }
+  @UseGuards(JwtCookieGuard)
+  @Get('/:id/comentarios')
+  obtenerComentarios(@Param('id') id: string) {
+    return this.publicacionesService.obtenerComentarios(id);
+  }
+  @UseGuards(JwtCookieGuard)
+  @Delete('/comentarios/:id')
+  borrarComentario(@Param('id') id: string, @Req() req) {
+    return this.publicacionesService.eliminarComentario(
+      id,
+      req.user.nombreUsuario,
+    );
+  }
   //Put de comentario
 }

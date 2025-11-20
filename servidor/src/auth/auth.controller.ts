@@ -63,13 +63,11 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const resultado = await this.authService.loginCookie(body);
-    // Centralizar seteo de cookie en el servicio para evitar duplicación
     this.authService.setCookie(response, resultado.token, 15);
     response.json({ resultado });
   }
   @Post('logout')
   logout(@Res({ passthrough: true }) response: Response) {
-    // Limpiar cookie de sesión
     response.clearCookie('token', {
       httpOnly: true,
       sameSite: 'strict',
@@ -111,7 +109,6 @@ export class AuthController {
       throw new BadRequestException('Token no encontrado');
     }
     const datos: any = decode(token) as any;
-    // generar nuevo token usando la misma info
     const nuevoToken = this.authService.guardarEnCookie(
       datos.user,
       datos.Url,

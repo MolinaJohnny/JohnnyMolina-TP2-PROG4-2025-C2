@@ -101,7 +101,6 @@ export class AuthService {
     return token;
   }
 
-  // Centralizar el seteo de la cookie para evitar duplicación en controllers
   setCookie(response: Response, token: string, minutes = 15) {
     response.cookie('token', token, {
       httpOnly: true,
@@ -129,7 +128,6 @@ export class AuthService {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
-    // Generar token con la id incluida
     const token = this.guardarEnCookie(
       usuario.nombreUsuario,
       usuario.imagenUrl,

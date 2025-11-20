@@ -54,8 +54,6 @@ export class Registro {
     this.auth.register(formData).subscribe({
       next: (resp: any) => {
         console.log('Registro exitoso', resp);
-        // Nota: el backend devuelve token pero no siempre configura la cookie.
-        // Iniciamos el estado de autenticación y el temporizador de sesión.
         this.auth.authState.set(true);
         this.session.start(10);
       },

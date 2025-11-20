@@ -10,9 +10,7 @@ import { environment } from '../../environments/environment';
 export class Auth {
   httpClient = inject(HttpClient);
   
-  // observable de estado de autenticación - inicializa en false, se actualiza por splash
   authState = signal<boolean>(false);
-  // Flag para saber si ya se validó la sesión
   isInitialized = signal<boolean>(false);
 
   loginCookie(usuario: Usuario) {
@@ -29,7 +27,6 @@ export class Auth {
     return data;
   }
   register(usuario: FormData) {
-    // retornar observable para que el componente que llama pueda manejar la respuesta
     return this.httpClient.post(`${environment.apiUrl}/auth/register`, usuario);
   }
 
@@ -61,7 +58,6 @@ export class Auth {
   }
 
   logout() {
-    // Llamar al backend para borrar la cookie y luego limpiar el estado local
     return this.httpClient.post(`${environment.apiUrl}/auth/logout`, {}, { withCredentials: true })
     .pipe(
       tap(() => {

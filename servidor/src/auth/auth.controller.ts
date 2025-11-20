@@ -63,12 +63,8 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const resultado = await this.authService.loginCookie(body);
-    response.cookie('token', resultado.token, {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: false, // Cambiar a true si antes de entregar ajksdlasd
-      expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutos menos la diferencia horaria
-    });
+    // Centralizar seteo de cookie en el servicio para evitar duplicación
+    this.authService.setCookie(response, resultado.token, 15);
     response.json({ resultado });
   }
   @Post('logout')
@@ -123,12 +119,7 @@ export class AuthController {
       datos.id,
     );
 
-    response.cookie('token', nuevoToken, {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: false,
-      expires: new Date(Date.now() + 15 * 60 * 1000),
-    });
+    this.authService.setCookie(response, nuevoToken, 15);
 
     return { token: nuevoToken };
   }

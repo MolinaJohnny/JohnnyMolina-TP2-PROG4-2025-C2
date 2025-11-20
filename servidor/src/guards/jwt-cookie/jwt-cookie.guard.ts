@@ -31,19 +31,16 @@ export class JwtCookieGuard implements CanActivate {
     const secret = this.configService.get<string>('CONTRASENA_SEGURA');
 
     try {
-      // 1. Verifica firma (importante)
       verify(token, secret!);
 
-      // 2. Decodifica contenido (no vuelve a verificar)
       const payload: any = decode(token);
 
-      // 3. Adaptar las propiedades al formato esperado por tu backend
       request.user = {
         id: payload._id,
-        nombreUsuario: payload.user, // <-- Mapea "user" a "nombreUsuario"
-        imagenUrl: payload.Url, // <-- Mapea "Url" a "imagenUrl"
+        nombreUsuario: payload.user,
+        imagenUrl: payload.Url,
         descripcion: payload.descripcion,
-        ...payload, // <-- por si hay más datos
+        ...payload,
       };
 
       return true;

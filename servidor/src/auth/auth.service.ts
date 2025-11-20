@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { UsuariosService } from 'src/usuarios/usuarios.service';
 import {
   JsonWebTokenError,
@@ -30,12 +31,16 @@ export class AuthService {
 
   async register(user: CreateUsuarioDto) {
     // Validar que el usuario no exista ya
-    const usuarioExistente = await this.usuariosService.findByNombreUsuario(user.nombreUsuario);
+    const usuarioExistente = await this.usuariosService.findByNombreUsuario(
+      user.nombreUsuario,
+    );
     if (usuarioExistente) {
       throw new BadRequestException('El nombre de usuario ya existe');
     }
 
-    const correoExistente = await this.usuariosService.findByCorreo(user.correo);
+    const correoExistente = await this.usuariosService.findByCorreo(
+      user.correo,
+    );
     if (correoExistente) {
       throw new BadRequestException('El correo electrónico ya está registrado');
     }
@@ -94,6 +99,16 @@ export class AuthService {
       expiresIn: '15m',
     });
     return token;
+  }
+
+  // Centralizar el seteo de la cookie para evitar duplicación en controllers
+  setCookie(response: Response, token: string, minutes = 15) {
+    response.cookie('token', token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: false,
+      expires: new Date(Date.now() + minutes * 60 * 1000),
+    });
   }
 
   async loginCookie(loginData: { nombreUsuario: string; contrasena: string }) {

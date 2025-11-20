@@ -17,7 +17,6 @@ export class JwtGuardGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request: Request = context.switchToHttp().getRequest();
-    // Leer el tóken de la request (header)
 
     const authHeader: string | undefined = request.headers.authorization;
 
@@ -27,19 +26,14 @@ export class JwtGuardGuard implements CanActivate {
 
     if (tipo !== 'Bearer') throw new UnauthorizedException();
 
-    // Verificarlo
-
     try {
       const tokenValidado = verify(token, contrasenaSecreta);
-      // Pasar los datos importantes del payload (ej. id usuario)
       // return true
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       (request as any).user = tokenValidado;
 
       return true;
-
-      // Caso de error, throw de error
     } catch (error) {
       if (error instanceof TokenExpiredError) {
         throw new HttpException('Token expirado', 401);

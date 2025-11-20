@@ -77,9 +77,6 @@ export class PublicacionesController {
       limit: safeLimit,
     };
 
-    console.log('GET /todas - Parámetros recibidos:', { sort, offset, limit });
-    console.log('GET /todas - Parámetros normalizados:', opts);
-
     return this.publicacionesService.findAll(opts);
   }
 
@@ -118,7 +115,6 @@ export class PublicacionesController {
     @Req() req: Request,
     @Body('contenido') contenido: string,
   ) {
-    console.log(req.user.id);
     return await this.publicacionesService.agregarComentario(
       id,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access

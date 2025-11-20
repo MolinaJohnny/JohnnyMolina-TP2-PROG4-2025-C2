@@ -39,7 +39,6 @@ export class App implements OnInit {
       this.auth.clearToken();
     }
     
-    // En todos los casos, ocultamos el splash y mostramos el contenido
     this.showSplash.set(false);
     this.auth.isInitialized.set(true);
   }

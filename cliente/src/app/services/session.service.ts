@@ -15,11 +15,11 @@ export class SessionService {
     
   // modificar minutes para que avise 3 minutos antes
 
-  start(minutes = 10) {
+  start(minutes = 5) {
     this.stop();
     this.durationMinutes = minutes;
     // modificar para que avise 3 minutos antes
-    const warningMs = Math.max(0, (minutes - 5)) * 60 * 1000; 
+    const warningMs = Math.max(0, (minutes - 3)) * 60 * 1000; 
     const expiryMs = minutes * 60 * 1000;
 
     // Si minutes=10, warningMs = 5min

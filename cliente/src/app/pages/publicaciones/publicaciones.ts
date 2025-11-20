@@ -158,11 +158,6 @@ export class Publicaciones implements OnInit {
       return;
     }
 
-    if (!this.imagenSeleccionada) {
-      console.log('Debes seleccionar una imagen');
-      return;
-    }
-
     const usuario = await this.authService.dataCookie();
     const form = this.postForm.value;
 
@@ -171,7 +166,10 @@ export class Publicaciones implements OnInit {
     formData.append('descripcion', form.contenido ?? '');
     formData.append('usuario', usuario.resultado['usuario'].nombreUsuario);
     formData.append('usuarioId', usuario.resultado['usuario']._id);
-    formData.append('urlImagen', this.imagenSeleccionada); 
+    
+    if (this.imagenSeleccionada) {
+      formData.append('urlImagen', this.imagenSeleccionada);
+    }
 
     this.publicacionesService.subirPublicacion(formData).subscribe({
       next: () => {

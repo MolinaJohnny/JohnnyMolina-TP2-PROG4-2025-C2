@@ -40,25 +40,19 @@ export class PublicacionesController {
     }),
   )
   async create(
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 1000000 })],
-      }),
-    )
-    file: Express.Multer.File,
+    @UploadedFile()
+    file: Express.Multer.File | undefined,
     @Body() createPublicacioneDto: CreatePublicacioneDto,
   ) {
-    if (!file) {
-      throw new BadRequestException('No se ha subido ninguna imagen');
-    }
-
     if (!createPublicacioneDto.descripcion) {
       throw new BadRequestException(
         'La descripción de la publicación es requerida',
       );
     }
 
-    createPublicacioneDto.urlImagen = `/images/${file.filename}`;
+    if (file) {
+      createPublicacioneDto.urlImagen = `/images/${file.filename}`;
+    }
 
     return await this.publicacionesService.create(createPublicacioneDto);
   }

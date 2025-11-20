@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 export class CreatePublicacioneDto {
   @IsString()
   @IsNotEmpty()
@@ -7,6 +7,8 @@ export class CreatePublicacioneDto {
   @IsNotEmpty()
   descripcion: string;
 
+  @IsOptional()
+  @IsString()
   urlImagen?: string;
 
   @IsString()

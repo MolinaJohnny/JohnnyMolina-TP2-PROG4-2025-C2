@@ -29,19 +29,8 @@ export class Auth {
     return data;
   }
   register(usuario: FormData) {
-    const peticion = this.httpClient.post(
-      `${environment.apiUrl}/auth/register`,
-      usuario,
-      {
-        // credentials: 'include',
-      }
-    );
-    
-    peticion.subscribe((respuesta) => {
-      console.log('Registro exitoso:', respuesta);
-    }, (error) => {
-      console.error('Error en el registro:', error);
-    });
+    // retornar observable para que el componente que llama pueda manejar la respuesta
+    return this.httpClient.post(`${environment.apiUrl}/auth/register`, usuario);
   }
 
   login(usuario: Usuario) {
@@ -79,6 +68,10 @@ export class Auth {
         this.clearToken();
       })
     );
+  }
+ 
+  refreshCookie() {
+    return this.httpClient.post(`${environment.apiUrl}/auth/refresh`, {}, { withCredentials: true });
   }
 };
 

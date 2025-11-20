@@ -3,6 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { NgIf } from '@angular/common';
 import { Auth } from '../../services/auth';
 import { Router } from '@angular/router';
+import { SessionService } from '../../services/session.service';
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, NgIf],
@@ -17,6 +18,7 @@ export class Login {
 
   auth = inject(Auth);
   router = inject(Router);
+  session = inject(SessionService);
 
   enviarFormulario() {
     if (this.loginForm.valid) {
@@ -25,6 +27,7 @@ export class Login {
         next: (respuesta: any) => {
           console.log('Login (cookie) respuesta:', respuesta);
           this.auth.authState.set(true);
+          this.session.start(10);
           this.router.navigate(['/publicaciones']);
         },
         error: (err) => {
@@ -43,6 +46,7 @@ export class Login {
       next: (resp) => {
         console.log('logueo test ok', resp);
         this.auth.authState.set(true);
+        this.session.start(10);
         this.router.navigate(['/publicaciones']);
       },
       error: (err) => {

@@ -2,6 +2,7 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet, Router } from '@angular/router';
 import { NgIf, CommonModule } from '@angular/common';
 import { Auth } from './services/auth';
+import { SessionService } from './services/session.service';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,7 @@ export class App implements OnInit {
   protected readonly title = signal('cliente');
   auth = inject(Auth);
   router = inject(Router);
+  session = inject(SessionService);
 
   isAuthenticated = this.auth.authState;
   isInitialized = this.auth.isInitialized;

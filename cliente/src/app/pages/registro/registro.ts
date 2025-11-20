@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators, ValidationErrors } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { Auth } from '../../services/auth';
+import { SessionService } from '../../services/session.service';
 
 @Component({
   selector: 'app-registro',
@@ -26,6 +27,7 @@ export class Registro {
   });
 
   auth = inject(Auth);
+  session = inject(SessionService);
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (!file) return;
@@ -49,7 +51,19 @@ export class Registro {
 
     formData.append('imagenUrl', this.selectedFile);
 
-    this.auth.register(formData);
+    this.auth.register(formData).subscribe({
+      next: (resp: any) => {
+        console.log('Registro exitoso', resp);
+        // Nota: el backend devuelve token pero no siempre configura la cookie.
+        // Iniciamos el estado de autenticación y el temporizador de sesión.
+        this.auth.authState.set(true);
+        this.session.start(10);
+      },
+      error: (err) => {
+        console.error('Error en registro', err);
+        alert('Error al registrar');
+      }
+    });
   } else {
     alert('Completa todos los campos e incluye una imagen');
   }

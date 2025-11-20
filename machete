@@ -77,3 +77,44 @@
         bw.write(json);
     }
     }
+
+
+
+
+
+
+     public void cargarDatos() {
+        List<Robot> robots = new ArrayList<>();
+
+        try {
+            for (String linea : servicio.cargar("robots.json")) {
+                if (linea == null || linea.isEmpty()) continue;
+
+                String[] partes = linea.split(";");
+                String tipo = partes[0];
+
+                Robot v = null;
+                switch (tipo) {
+                    case "RobotDomestico":
+                        v = new RobotDomestico(servicioJson);
+                        
+                        break;
+                    case "RobotIndustrial":
+                        v = new RobotIndustrial().fromJSON(linea);
+                        break;
+                    default:
+                        System.out.println("Tipo desconocido: " + tipo);
+                }
+
+                if (v != null) robots.add(v);
+            }
+            System.out.println(robots);
+            laboratorio = new Laboratorio();
+            laboratorio.getRobots().addAll(robots);
+            System.out.println(laboratorio.getRobots());
+            refrescarLista();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }

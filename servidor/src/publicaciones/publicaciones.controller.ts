@@ -10,8 +10,6 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
-  ParseFilePipe,
-  MaxFileSizeValidator,
   UseGuards,
   Query,
 } from '@nestjs/common';
@@ -78,6 +76,9 @@ export class PublicacionesController {
       offset: safeOffset,
       limit: safeLimit,
     };
+
+    console.log('GET /todas - Parámetros recibidos:', { sort, offset, limit });
+    console.log('GET /todas - Parámetros normalizados:', opts);
 
     return this.publicacionesService.findAll(opts);
   }

@@ -17,6 +17,7 @@ import { ToastrService } from 'ngx-toastr';
 export class Publicaciones implements OnInit {
   constructor(private toastr: ToastrService){}
 
+  environment = environment;
 
   postForm = new FormGroup({
     titulo: new FormControl('', [Validators.required]),
@@ -34,7 +35,7 @@ export class Publicaciones implements OnInit {
   filtros = {
     sort: 'date',
     offset: 0,
-    limit: 10,
+    limit: 4,
   };
   modalAbierto = false;
   publicacionSeleccionada: any = null;
@@ -122,16 +123,30 @@ export class Publicaciones implements OnInit {
   }
 
   cargarPublicaciones() {
+    const limit = typeof this.filtros.limit === 'string' 
+      ? parseInt(this.filtros.limit, 10) 
+      : this.filtros.limit;
+    const offset = typeof this.filtros.offset === 'string' 
+      ? parseInt(this.filtros.offset, 10) 
+      : this.filtros.offset;
+
     const opts: any = {
-      sort: this.filtros.sort,
-      offset: this.filtros.offset,
-      limit: this.filtros.limit,
+      sort: this.filtros.sort || 'date',
+      offset: offset,
+      limit: limit,
     };
+
 
     this.publicacionesService.obtenerPublicaciones(opts).subscribe({
       next: (datos: any) => {
-        this.publicaciones = Array.isArray(datos) ? datos : datos?.data ?? [];
-        console.log('Publicaciones cargadas:', this.publicaciones);
+        const lista = Array.isArray(datos) ? datos : datos?.data ?? [];
+        lista.sort((a: any, b: any) => {
+          const fa = a?.fechaCreacion ? new Date(a.fechaCreacion).getTime() : 0;
+          const fb = b?.fechaCreacion ? new Date(b.fechaCreacion).getTime() : 0;
+          return fb - fa; // descendente: más reciente primero
+        });
+        this.publicaciones = lista;
+        console.log('Publicaciones cargadas:', this.publicaciones.map((porqueria:any)=>porqueria.fechaCreacion));
       },
       error: (err) => {
         console.error('Error cargando publicaciones:', err);
@@ -141,6 +156,9 @@ export class Publicaciones implements OnInit {
   }
 
   aplicarFiltros() {
+    if (typeof this.filtros.limit === 'string') {
+      this.filtros.limit = parseInt(this.filtros.limit, 10);
+    }
     this.filtros.offset = 0;
     this.cargarPublicaciones();
   }
@@ -148,7 +166,7 @@ export class Publicaciones implements OnInit {
   resetearFiltros() {
     this.filtros.sort = 'date';
     this.filtros.offset = 0;
-    this.filtros.limit = 10;
+    this.filtros.limit = 4;
     this.cargarPublicaciones();
   }
 
@@ -178,7 +196,6 @@ export class Publicaciones implements OnInit {
         this.postForm.reset();
         this.imagenSeleccionada = null;
 
-        // Recargar publicaciones
         this.cargarPublicaciones();
       },
       error: (err) => {

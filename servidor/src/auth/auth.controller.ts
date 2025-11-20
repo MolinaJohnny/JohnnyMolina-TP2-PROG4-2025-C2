@@ -83,7 +83,7 @@ export class AuthController {
   }
   @UseGuards(JwtCookieGuard)
   @Get('data/jwt/cookie')
-  async traerConGuardYCookie(@Req() request: Request) {
+  traerConGuardYCookie(@Req() request: Request) {
     const token = request.cookies['token'] as string;
     if (!token) {
       throw new BadRequestException('Token no encontrado');
@@ -102,5 +102,34 @@ export class AuthController {
         },
       },
     };
+  }
+
+  @Post('refresh')
+  @UseGuards(JwtCookieGuard)
+  refreshToken(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const token = request.cookies['token'] as string;
+    if (!token) {
+      throw new BadRequestException('Token no encontrado');
+    }
+    const datos: any = decode(token) as any;
+    // generar nuevo token usando la misma info
+    const nuevoToken = this.authService.guardarEnCookie(
+      datos.user,
+      datos.Url,
+      datos.descripcion,
+      datos.id,
+    );
+
+    response.cookie('token', nuevoToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: false,
+      expires: new Date(Date.now() + 15 * 60 * 1000),
+    });
+
+    return { token: nuevoToken };
   }
 }

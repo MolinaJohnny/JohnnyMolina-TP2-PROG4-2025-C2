@@ -1,4 +1,3 @@
-<!-- SPLASH MODAL -->
 	<div *ngIf="showSplash()" class="splash-modal-overlay">
 		<div class="splash-modal">
 			<div class="spinner"></div>
@@ -6,7 +5,6 @@
 		</div>
 	</div>
 
-	<!-- CONTENIDO PRINCIPAL -->
 	<div *ngIf="!showSplash()">
 	<svg xmlns="http://www.w3.org/2000/svg" class="d-none">
         <symbol id="check2" viewBox="0 0 16 16">
@@ -71,10 +69,8 @@
 
                 <nav class="nav nav-masthead">
                     <button class="nav-link fw-bold py-1 px-0 active" routerLink="publicaciones">Publicaciones</button>
-                    <!-- Mostrar Login y Registro sólo si NO está autenticado -->
                     <button *ngIf="!(isAuthenticated())" class="nav-link fw-bold py-1 px-0" routerLink="login"> Login</button>
                     <button *ngIf="!(isAuthenticated())" class="nav-link fw-bold py-1 px-0" routerLink="registro"> Registro</button>
-                    <!-- Mostrar Cerrar sesión cuando está autenticado (en la misma posición donde estaba Registro) -->
                     <button *ngIf="isAuthenticated()" class="nav-link fw-bold py-1 px-0" type="button" (click)="logout()">Cerrar sesión</button>
                     <button class="nav-link fw-bold py-1 px-0" routerLink="mi-perfil"> Mi perfil</button>
                 </nav>
@@ -88,5 +84,23 @@
                     href="https://x.com/mdo" class="text-white">@mdo</a>.</p>
         </footer>
     </div>
+        <!-- Session warning modal -->
+        <div *ngIf="session.showWarning()" class="modal fade show" tabindex="-1" style="display:block; background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sesión por expirar</h5>
+                        <button type="button" class="btn-close" aria-label="Close" (click)="session.declineExtend()"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Quedan 5 minutos de sesión. ¿Deseas extender tu sesión?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" (click)="session.declineExtend()">No, gracias</button>
+                        <button type="button" class="btn btn-primary" (click)="session.acceptExtend()">Extender sesión</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     <script src="../assets/dist/js/bootstrap.bundle.min.js" class="astro-vvvwv3sm"></script>
 	</div>

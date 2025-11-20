@@ -25,16 +25,16 @@
     <div class="col-md-3">
       <select class="form-select" [(ngModel)]="filtros.sort" (change)="aplicarFiltros()">
         <option value="" disabled selected>Ordenar Por:</option>
-        <option value="date">Más recientes</option>
+        <option value="date">Más reciente</option>
         <option value="likes">Más populares</option>
       </select>
     </div>
     <div class="col-md-2">
       <select class="form-select" [(ngModel)]="filtros.limit" (change)="aplicarFiltros()">
         <option value="" disabled selected>Por página:</option>
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="50">50</option>
+        <option [value]="4">4</option>
+        <option [value]="8">8</option>
+        <option [value]="15">15</option>
       </select>
     </div>
   </div>
@@ -46,10 +46,11 @@
     </div>
 
     <div *ngFor="let pub of publicaciones" class="card p-3">
-      <div class="d-flex justify-content-between">
-        <div>
+      <div class="d-flex justify-content-between gap-3">
+        <div class="flex-grow-1">
           <h5>{{ pub.titulo }}</h5>
           <small class="text-muted">Publicado por {{ pub.usuario }}</small>
+          <img *ngIf="pub.urlImagen" [src]="environment.apiUrl + pub.urlImagen" class="img-thumbnail mt-2" style="max-width: 300px; max-height: 200px; object-fit: contain;">
         </div>
         <div class="d-flex flex-column gap-2 publicacion-botones">
           <button class="btn btn-sm btn-outline-secondary" (click)="abrirModal(pub)">Ver</button>
@@ -79,7 +80,6 @@
           <input type="text" class="form-control" placeholder="Escribir comentario..." [(ngModel)]="nuevoComentario" name="comentario" />
           <button type="button" class="btn btn-primary btn-sm mt-2" (click)="agregarComentario()">Comentar</button>
         </div>
-        <!-- Comentarios existentes -->
         <div *ngIf="publicacionSeleccionada.comentarios?.length > 0" class="mb-2">
           <h6 class="mt-3">Comentarios:</h6>
           <div *ngFor="let comentario of comentarios$ | async" class="border rounded p-2 mb-2 bg-light">
@@ -103,6 +103,6 @@
   <div class="d-flex justify-content-center gap-2 mt-4" *ngIf="publicaciones.length > 0">
     <button class="btn btn-outline-primary" (click)="paginaAnterior()" [disabled]="filtros.offset === 0">← Anterior</button>
     <span class="d-flex align-items-center px-2">Página {{ (filtros.offset / filtros.limit) + 1 }}</span>
-    <button class="btn btn-outline-primary" (click)="paginaSiguiente()" [disabled]="publicaciones.length">Siguiente →</button>
+    <button class="btn btn-outline-primary" (click)="paginaSiguiente()" [disabled]="publicaciones.length < filtros.limit">Siguiente →</button>
   </div>
 </div>

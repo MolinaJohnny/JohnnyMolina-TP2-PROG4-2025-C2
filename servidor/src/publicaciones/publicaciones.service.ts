@@ -34,7 +34,12 @@ export class PublicacionesService {
       const skip = typeof opts?.offset === 'number' ? opts.offset : 0;
       const limit = typeof opts?.limit === 'number' ? opts.limit : 20;
 
-      // Orden por cantidad de likes requiere pipeline, por defecto ordenar por fecha (fechaCreacion desc)
+      console.log('findAll - Opciones recibidas:', {
+        sort: opts?.sort,
+        offset: skip,
+        limit,
+      });
+
       if (opts?.sort === 'likes') {
         const pipeline: any[] = [
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -47,12 +52,14 @@ export class PublicacionesService {
           { $limit: limit },
         ];
 
+        console.log('Ejecutando pipeline de likes');
         const resultados = await this.instModel.aggregate(pipeline).exec();
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return resultados;
       }
 
       // default: sort by creation date descending (nuevas -> viejas)
+      console.log('Ordenando por fecha (descending)');
       const publicaciones = await this.instModel
         .find(match)
         .sort({ fechaCreacion: -1 })
@@ -60,6 +67,7 @@ export class PublicacionesService {
         .limit(limit)
         .exec();
 
+      console.log(`Retornando ${publicaciones.length} publicaciones`);
       return publicaciones;
     } catch (error) {
       console.error('Error al traer las publicaciones:', error);

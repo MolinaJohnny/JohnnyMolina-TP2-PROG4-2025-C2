@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   BadRequestException,
   Injectable,
@@ -14,6 +15,7 @@ import {
 import { CreateUsuarioDto } from 'src/usuarios/dto/create-usuario.dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
+
 @Injectable()
 export class AuthService {
   private readonly contrasenaSecreta: any;
@@ -21,23 +23,34 @@ export class AuthService {
   constructor(
     private configService: ConfigService,
     private readonly usuariosService: UsuariosService,
-    // private readonly jwtService: JwtService,
   ) {
     this.contrasenaSecreta =
       this.configService.get<string>('CONTRASENA_SEGURA');
   }
+
   async register(user: CreateUsuarioDto) {
+    // Validar que el usuario no exista ya
+    const usuarioExistente = await this.usuariosService.findByNombreUsuario(user.nombreUsuario);
+    if (usuarioExistente) {
+      throw new BadRequestException('El nombre de usuario ya existe');
+    }
+
+    const correoExistente = await this.usuariosService.findByCorreo(user.correo);
+    if (correoExistente) {
+      throw new BadRequestException('El correo electrónico ya está registrado');
+    }
+
     const nuevoUsuario = await this.usuariosService.create(user);
 
     return this.guardarEnCookie(
       nuevoUsuario.nombreUsuario,
       nuevoUsuario.imagenUrl,
       nuevoUsuario.descripcion,
+      nuevoUsuario._id.toString(),
     );
   }
 
   verificar(authHeader: string) {
-    console.log(authHeader);
     if (!authHeader) throw new BadRequestException('No token');
     const [tipo, token] = authHeader.split(' ');
 
@@ -56,23 +69,33 @@ export class AuthService {
       throw new InternalServerErrorException('');
     }
   }
-  guardarEnCookie(userName: string, imagenUrl: string, descripcion: string) {
+
+  guardarEnCookie(
+    userName: string,
+    imagenUrl: string,
+    descripcion: string,
+    id: string,
+  ) {
     const payload: {
+      id: string;
       user: string;
       admin: boolean;
       Url: string;
       descripcion: string;
     } = {
+      id: id,
       user: userName,
       Url: imagenUrl,
       descripcion: descripcion,
       admin: false,
     };
+
     const token: string = sign(payload, this.contrasenaSecreta, {
       expiresIn: '15m',
     });
     return token;
   }
+
   async loginCookie(loginData: { nombreUsuario: string; contrasena: string }) {
     const usuario = await this.usuariosService.findByNombreUsuario(
       loginData.nombreUsuario,
@@ -82,7 +105,6 @@ export class AuthService {
       throw new UnauthorizedException('Usuario no encontrado');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
     const contrasenaValida = await bcrypt.compare(
       loginData.contrasena,
       usuario.contrasena,
@@ -92,14 +114,14 @@ export class AuthService {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
-    // Generar token
+    // Generar token con la id incluida
     const token = this.guardarEnCookie(
       usuario.nombreUsuario,
       usuario.imagenUrl,
       usuario.descripcion,
+      usuario._id.toString(),
     );
 
-    // Devolver token y datos del usuario
     return {
       token,
       usuario: {

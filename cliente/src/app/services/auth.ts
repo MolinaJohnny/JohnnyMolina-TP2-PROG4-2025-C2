@@ -9,10 +9,11 @@ import { environment } from '../../environments/environment';
 })
 export class Auth {
   httpClient = inject(HttpClient);
-  constructor(){
-  }
-  // observaable de estado de autenticación
-  authState = signal<boolean>(!!localStorage.getItem('token'));
+  
+  // observable de estado de autenticación - inicializa en false, se actualiza por splash
+  authState = signal<boolean>(false);
+  // Flag para saber si ya se validó la sesión
+  isInitialized = signal<boolean>(false);
 
   loginCookie(usuario: Usuario) {
     return this.httpClient.post(`${environment.apiUrl}/auth/login/cookie`, usuario, {
@@ -24,6 +25,7 @@ export class Auth {
       withCredentials: true,
     })
     const data : any = await firstValueFrom(observable)
+    console.log("Data cookie obtenida:", data);
     return data;
   }
   register(usuario: FormData) {
@@ -55,7 +57,7 @@ export class Auth {
       if (token) {
         localStorage.setItem('token', token);
         this.authState.set(true);
-        console.log("Esto deberia funcionar");
+        // console.log("Esto deberia funcionar");
       } else {
         this.authState.set(false);
       }

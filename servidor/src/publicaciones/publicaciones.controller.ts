@@ -13,6 +13,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { PublicacionesService } from './publicaciones.service';
 import { CreatePublicacioneDto } from './dto/create-publicacione.dto';
@@ -38,10 +39,10 @@ export class PublicacionesController {
       }),
     }),
   )
-  create(
+  async create(
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 10000 })],
+        validators: [new MaxFileSizeValidator({ maxSize: 1000000 })],
       }),
     )
     file: Express.Multer.File,
@@ -51,30 +52,51 @@ export class PublicacionesController {
       throw new BadRequestException('No se ha subido ninguna imagen');
     }
 
+    if (!createPublicacioneDto.descripcion) {
+      throw new BadRequestException(
+        'La descripción de la publicación es requerida',
+      );
+    }
+
     createPublicacioneDto.urlImagen = `/images/${file.filename}`;
 
-    return this.publicacionesService.create(createPublicacioneDto);
+    return await this.publicacionesService.create(createPublicacioneDto);
   }
 
   @Get('/todas')
-  findAll() {
-    return this.publicacionesService.findAll();
+  findAll(
+    @Query('sort') sort?: string,
+    @Query('offset') offset?: string,
+    @Query('limit') limit?: string,
+  ) {
+    // Normalizar y validar parámetros
+    const parsedOffset = offset ? parseInt(offset, 10) : 0;
+    const parsedLimit = limit ? parseInt(limit, 10) : 20;
+    const safeOffset =
+      Number.isNaN(parsedOffset) || parsedOffset < 0 ? 0 : parsedOffset;
+    const safeLimit =
+      Number.isNaN(parsedLimit) || parsedLimit <= 0
+        ? 20
+        : Math.min(parsedLimit, 100);
+
+    const opts: { sort?: string; offset?: number; limit?: number } = {
+      sort: sort ?? 'date',
+      offset: safeOffset,
+      limit: safeLimit,
+    };
+
+    return this.publicacionesService.findAll(opts);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.publicacionesService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.publicacionesService.findOneById(id);
   }
-
+  @UseGuards(JwtCookieGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req: Request) {
-    const usuarioData = (
-      req as unknown as Record<string, Record<string, unknown>>
-    )?.user;
-    const usuarioId = String(usuarioData?.id || usuarioData?._id);
-    return this.publicacionesService.remove(id, usuarioId);
+  eliminarPublicacion(@Param('id') id: string, @Req() req: any) {
+    return this.publicacionesService.eliminarPublicacion(id, req.user.id);
   }
-
   @Post(':id/reactivate')
   reactivate(@Param('id') id: string, @Req() req: Request) {
     const usuarioData = (
@@ -86,6 +108,8 @@ export class PublicacionesController {
   @Post(':id/like')
   @UseGuards(JwtCookieGuard)
   toggleLike(@Param('id') id: string, @Req() req: Request) {
+    console.log('REQ.USER DESDE COOKIE GUARD:', req.user);
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     return this.publicacionesService.toggleLike(id, req.user.nombreUsuario);
   }
@@ -94,30 +118,28 @@ export class PublicacionesController {
   //Post de comentario
   @UseGuards(JwtCookieGuard)
   @Post('/:id/comentarios')
-  crearComentario(
+  async crearComentario(
     @Param('id') id: string,
     @Req() req: Request,
     @Body('contenido') contenido: string,
   ) {
-    return this.publicacionesService.agregarComentario(
+    console.log(req.user.id);
+    return await this.publicacionesService.agregarComentario(
       id,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-      req.user.nombreUsuario,
+      req.user.id,
       contenido,
     );
   }
   @UseGuards(JwtCookieGuard)
   @Get('/:id/comentarios')
-  obtenerComentarios(@Param('id') id: string) {
-    return this.publicacionesService.obtenerComentarios(id);
+  async obtenerComentarios(@Param('id') id: string) {
+    return await this.publicacionesService.obtenerComentarios(id);
   }
   @UseGuards(JwtCookieGuard)
   @Delete('/comentarios/:id')
-  borrarComentario(@Param('id') id: string, @Req() req) {
-    return this.publicacionesService.eliminarComentario(
-      id,
-      req.user.nombreUsuario,
-    );
+  async borrarComentario(@Param('id') id: string, @Req() req: Request) {
+    return await this.publicacionesService.eliminarComentario(id, req.user.id);
   }
   //Put de comentario
 }

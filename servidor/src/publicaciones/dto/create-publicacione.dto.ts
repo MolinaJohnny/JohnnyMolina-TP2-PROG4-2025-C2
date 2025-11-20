@@ -12,4 +12,7 @@ export class CreatePublicacioneDto {
   @IsString()
   @IsNotEmpty()
   usuario: string;
+  @IsString()
+  @IsNotEmpty()
+  usuarioId: string;
 }

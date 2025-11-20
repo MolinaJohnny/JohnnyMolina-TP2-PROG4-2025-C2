@@ -40,7 +40,7 @@ export class AuthController {
       }),
     }),
   )
-  register(
+  async register(
     @UploadedFile(
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 4000000 })],
@@ -53,7 +53,7 @@ export class AuthController {
       throw new BadRequestException('No se ha subido ninguna imagen');
     }
     body.imagenUrl = `/images/users/${file.filename}`;
-    const token = this.authService.register(body);
+    const token = await this.authService.register(body);
     return { token };
   }
 
@@ -83,8 +83,11 @@ export class AuthController {
   }
   @UseGuards(JwtCookieGuard)
   @Get('data/jwt/cookie')
-  traerConGuardYCookie(@Req() request: Request) {
+  async traerConGuardYCookie(@Req() request: Request) {
     const token = request.cookies['token'] as string;
+    if (!token) {
+      throw new BadRequestException('Token no encontrado');
+    }
     const datos: any = decode(token);
     console.log(datos);
 
@@ -95,6 +98,7 @@ export class AuthController {
           nombreUsuario: datos.user,
           urlImagen: datos.Url,
           descripcion: datos.descripcion,
+          _id: datos.id,
         },
       },
     };

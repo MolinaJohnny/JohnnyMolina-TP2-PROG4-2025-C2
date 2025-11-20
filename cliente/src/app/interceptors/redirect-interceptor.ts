@@ -11,11 +11,40 @@ export const redirectInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
-      console.log(err instanceof HttpErrorResponse);
-      if (err.status === 401) {
-        console.log('Podría redirigir a algun lado...');
-        router.navigate(['/login']); 
+      console.log('Error interceptado:', err);
+      
+      if (err.status === 401 || err.status === 403) {
+        console.log('Error de autenticación, redirigiendo a login...');
+        router.navigate(['/login']);
+        return throwError(() => err);
       }
+
+      if (err.status === 400) {
+        const errorMessage = err.error?.message || '';
+        
+        if (
+          errorMessage.includes('imagen') ||
+          errorMessage.includes('archivo') ||
+          errorMessage.includes('publicación') ||
+          errorMessage.includes('comentario') ||
+          errorMessage.includes('descripción') ||
+          errorMessage.includes('contenido')
+        ) {
+          console.log('Error en archivo/publicación/comentario, redirigiendo a publicaciones...');
+          router.navigate(['/publicaciones']);
+          return throwError(() => err);
+        }
+      }
+
+      if (err.status === 404) {
+        const url = req.url.toLowerCase();
+        if (url.includes('publicaciones') || url.includes('comentarios')) {
+          console.log('Publicación/comentario no encontrado, redirigiendo a publicaciones...');
+          router.navigate(['/publicaciones']);
+          return throwError(() => err);
+        }
+      }
+
       return throwError(() => err);
     })
   );

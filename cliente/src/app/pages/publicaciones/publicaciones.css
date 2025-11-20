@@ -23,8 +23,8 @@
 }
 
 .modal-dialog {
-  margin: 10% auto;
-  max-width: 600px;
+  margin: 0% auto;
+  max-width: 800px;
 }
 
 .modal.show {

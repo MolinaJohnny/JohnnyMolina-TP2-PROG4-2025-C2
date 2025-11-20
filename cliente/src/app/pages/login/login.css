@@ -23,3 +23,24 @@ body {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+/* New styles to center the login form and keep footer at bottom */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 160px); /* adjust to account for header + footer height */
+  padding: 2rem 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border-radius: 8px;
+}
+
+/* Ensure main content takes minimum full height so footer stays at bottom */
+main {
+  min-height: calc(100vh - 120px);
+}

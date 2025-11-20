@@ -5,10 +5,11 @@ import {
   NotFoundException,
   InternalServerErrorException,
   UnauthorizedException,
+  // UnauthorizedException,
 } from '@nestjs/common';
 import { CreatePublicacioneDto } from './dto/create-publicacione.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { Comentario, Publicacione } from './entities/publicacione.entity';
 
 @Injectable()
@@ -26,44 +27,39 @@ export class PublicacionesService {
     return guardado;
   }
 
-  /**
-   * Obtener publicaciones con opciones de filtrado, ordenamiento y paginación.
-   * options: {
-   *   sort?: 'date'|'likes' (por defecto 'date'),
-   *   userId?: string,
-   *   offset?: number,
-   *   limit?: number,
-   * }
-   */
-  // findAll(options?: {
-  //   sort?: 'date' | 'likes';
-  //   userId?: string;
-  //   offset?: number;
-  //   limit?: number;
-  // }) {
-  //   const { sort = 'date', userId, offset = 0, limit = 20 } = options || {};
-
-  //   const filter: Record<string, unknown> = { eliminada: false };
-  //   if (userId) {
-  //     filter.usuario = userId;
-  //   }
-
-  //   let sortObj: Record<string, number> = { fechaCreacion: -1 };
-  //   if (sort === 'likes') {
-  //     sortObj = { likes: -1, fechaCreacion: -1 };
-  //   }
-
-  //   return this.instModel
-  //     .find(filter)
-  //     .sort(sortObj as any)
-  //     .skip(Number(offset))
-  //     .limit(Number(limit))
-  //     .populate('usuario')
-  //     .exec();
-  // }
-  async findAll() {
+  async findAll(opts?: { sort?: string; offset?: number; limit?: number }) {
     try {
-      const publicaciones = await this.instModel.find().exec();
+      const match: any = { eliminada: false };
+
+      const skip = typeof opts?.offset === 'number' ? opts.offset : 0;
+      const limit = typeof opts?.limit === 'number' ? opts.limit : 20;
+
+      // Orden por cantidad de likes requiere pipeline, por defecto ordenar por fecha (fechaCreacion desc)
+      if (opts?.sort === 'likes') {
+        const pipeline: any[] = [
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          { $match: match },
+          {
+            $addFields: { likesCount: { $size: { $ifNull: ['$likes', []] } } },
+          },
+          { $sort: { likesCount: -1, fechaCreacion: -1 } },
+          { $skip: skip },
+          { $limit: limit },
+        ];
+
+        const resultados = await this.instModel.aggregate(pipeline).exec();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return resultados;
+      }
+
+      // default: sort by creation date descending (nuevas -> viejas)
+      const publicaciones = await this.instModel
+        .find(match)
+        .sort({ fechaCreacion: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec();
+
       return publicaciones;
     } catch (error) {
       console.error('Error al traer las publicaciones:', error);
@@ -74,6 +70,17 @@ export class PublicacionesService {
   }
   findOne(id: number) {
     return `This action returns a #${id} publicacione`;
+  }
+
+  async findOneById(id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID de publicación inválido');
+    }
+    const publicacion = await this.instModel.findById(id);
+    if (!publicacion) {
+      throw new NotFoundException('Publicación no encontrada');
+    }
+    return publicacion;
   }
 
   async remove(id: string, usuarioId: string) {
@@ -91,7 +98,6 @@ export class PublicacionesService {
       throw new NotFoundException('Publicación no encontrada');
     }
 
-    // Verificar que el usuario sea el creador de la publicación
     if (publicacion.usuario.toString() !== usuarioId) {
       throw new ForbiddenException(
         'No tienes permiso para eliminar esta publicación',
@@ -102,7 +108,6 @@ export class PublicacionesService {
       throw new BadRequestException('La publicación ya ha sido eliminada');
     }
 
-    // Realizar baja lógica
     const resultado = await this.instModel.findByIdAndUpdate(
       id,
       {
@@ -124,7 +129,6 @@ export class PublicacionesService {
       throw new BadRequestException('ID de usuario inválido');
     }
 
-    // Buscar la publicación
     const publicacion = await this.instModel.findById(id);
 
     if (!publicacion) {
@@ -153,6 +157,9 @@ export class PublicacionesService {
     return resultado;
   }
   async toggleLike(publicacionId: string, nombreUsuario: string) {
+    if (!Types.ObjectId.isValid(publicacionId)) {
+      throw new BadRequestException('ID de publicación inválido');
+    }
     const publicacion = await this.instModel.findById(publicacionId);
 
     if (!publicacion) {
@@ -179,38 +186,76 @@ export class PublicacionesService {
   //                            Seccion Comentario
   async agregarComentario(
     publicacionId: string,
-    nombreUsuario: string,
+    usuarioId: string,
     contenido: string,
   ) {
-    const publicacion = await this.instModel.findById(publicacionId);
-    if (!publicacion) throw new NotFoundException('Publicación no encontrada');
+    if (!mongoose.Types.ObjectId.isValid(usuarioId)) {
+      throw new BadRequestException('UsuarioId inválido');
+    }
+    if (!mongoose.Types.ObjectId.isValid(publicacionId)) {
+      throw new BadRequestException('PublicacionId inválido');
+    }
 
-    const comentario = await this.comentarioModel.create({
+    const nuevoComentario = new this.comentarioModel({
+      usuario: usuarioId,
       contenido,
-      usuario: nombreUsuario,
       publicacion: publicacionId,
     });
+    await nuevoComentario.save();
 
-    publicacion.comentarios.push(comentario._id);
-    await publicacion.save();
+    const publicacionActualizada = await this.instModel
+      .findByIdAndUpdate(
+        publicacionId,
+        { $push: { comentarios: nuevoComentario._id } },
+        { new: true },
+      )
+      .populate({
+        path: 'comentarios',
+        populate: { path: 'usuario', select: 'nombreUsuario imagenUrl' },
+      });
 
-    return comentario;
+    if (!publicacionActualizada) {
+      throw new NotFoundException('Publicación no encontrada');
+    }
+
+    return publicacionActualizada;
   }
   async obtenerComentarios(publicacionId: string) {
-    return this.comentarioModel
+    if (!mongoose.Types.ObjectId.isValid(publicacionId)) {
+      throw new BadRequestException('ID de publicación inválido');
+    }
+    return await this.comentarioModel
       .find({ publicacion: publicacionId })
       .populate('usuario', 'nombreUsuario imagenUrl')
       .sort({ createdAt: -1 });
   }
-  async eliminarComentario(comentarioId: string, nombreUsuario: string) {
+  async eliminarPublicacion(publicacionId: string, usuarioId: string) {
+    const publicacion = await this.instModel.findById(publicacionId);
+    if (!publicacion) {
+      throw new NotFoundException('Publicación no encontrada');
+    }
+
+    if (publicacion.usuarioId != usuarioId) {
+      throw new UnauthorizedException('No puedes eliminar esta publicación');
+    }
+
+    publicacion.eliminada = true;
+    await publicacion.save();
+
+    return { ok: true, mensaje: 'Publicación marcada como eliminada' };
+  }
+  async eliminarComentario(comentarioId: string, usuarioId: string) {
     const comentario = await this.comentarioModel.findById(comentarioId);
-    if (!comentario) throw new NotFoundException('Comentario no encontrado');
-
-    if (comentario.usuario.toString() !== nombreUsuario)
+    if (!comentario) {
+      throw new NotFoundException('Comentario no encontrado');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+    const creadorComentario = comentario.usuario.toString();
+    console.log(creadorComentario, usuarioId);
+    if (creadorComentario !== usuarioId) {
       throw new UnauthorizedException('No puedes eliminar este comentario');
-
+    }
     await this.comentarioModel.deleteOne({ _id: comentarioId });
-
-    return { ok: true };
+    return { ok: true, mensaje: 'Comentario eliminado correctamente' };
   }
 }

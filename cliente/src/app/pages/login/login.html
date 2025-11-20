@@ -1,4 +1,5 @@
-<form class="card gap-2 p-3" [formGroup]="loginForm" (ngSubmit)="enviarFormulario()"> 
+<div class="login-container">
+  <form class="card gap-2 p-3 login-card" [formGroup]="loginForm" (ngSubmit)="enviarFormulario()"> 
         <h1 class="h3 mb-3 fw-normal">Inicie sesión</h1>
         <!-- Nombre de usuario input -->
         <div class="form-floating"> 
@@ -24,4 +25,5 @@
         </div> 
         <button class="btn btn-primary w-100 py-2" type="submit" [disabled]="!loginForm.valid">Iniciar</button>
         <button (click)="logueo()" class="btn btn-secondary w-100 py-2 mt-2" type="button">Inicio Test</button>
-</form>
+  </form>
+</div>

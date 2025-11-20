@@ -39,6 +39,7 @@ export class JwtCookieGuard implements CanActivate {
 
       // 3. Adaptar las propiedades al formato esperado por tu backend
       request.user = {
+        id: payload._id,
         nombreUsuario: payload.user, // <-- Mapea "user" a "nombreUsuario"
         imagenUrl: payload.Url, // <-- Mapea "Url" a "imagenUrl"
         descripcion: payload.descripcion,

@@ -1,19 +1,22 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgClass, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { PublicacionesService } from '../../services/publicaciones-service';
 import { Auth } from '../../services/auth';
 import { environment } from '../../../environments/environment';
-
+import { Observable } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-publicaciones',
-  imports: [ReactiveFormsModule, NgFor, NgIf, FormsModule, NgClass],
+  imports: [ReactiveFormsModule, NgFor, NgIf, FormsModule, NgClass, AsyncPipe],
   templateUrl: './publicaciones.html',
   styleUrl: './publicaciones.css',
 })
 export class Publicaciones implements OnInit {
+  constructor(private toastr: ToastrService){}
+
 
   postForm = new FormGroup({
     titulo: new FormControl('', [Validators.required]),
@@ -23,31 +26,27 @@ export class Publicaciones implements OnInit {
   publicacionesService = inject(PublicacionesService);
   authService = inject(Auth);
   route = inject(ActivatedRoute);
-
+  
   publicaciones: any[] = [];
   imagenSeleccionada: File | null = null;
   nuevoComentario: string = '';
 
   filtros = {
     sort: 'date',
-    userId: '',
     offset: 0,
     limit: 10,
   };
   modalAbierto = false;
   publicacionSeleccionada: any = null;
   rutaImagen: string = "";
+  comentarios$!: Observable<any[]>;
+
   abrirModal(pub: any) {
     this.publicacionSeleccionada = pub;
     this.modalAbierto = true;
-    this.rutaImagen = environment.apiUrl+this.publicacionSeleccionada.urlImagen
-    console.log(this.publicacionSeleccionada.urlImagen)
-    this.publicacionesService.obtenerComentarios(pub._id).subscribe({
-      next: (comentarios: any[]) => {
-        this.publicacionSeleccionada.comentarios = comentarios;
-      },
-      error: (err) => console.error("Error cargando comentarios:", err)
-    });
+    this.rutaImagen = environment.apiUrl + pub.urlImagen;
+
+    this.comentarios$ = this.publicacionesService.obtenerComentarios(pub._id);
   }
 
   cerrarModal(event?: Event) {
@@ -61,26 +60,58 @@ export class Publicaciones implements OnInit {
     this.publicacionesService
       .agregarComentario(this.publicacionSeleccionada._id, this.nuevoComentario)
       .subscribe({
-        next: (comentario: any) => {
-          if (!this.publicacionSeleccionada.comentarios) {
-            this.publicacionSeleccionada.comentarios = [];
-          }
-          this.publicacionSeleccionada.comentarios.unshift(comentario);
+        next: () => {
+          this.toastr.info('Comentario agregado', 'Info');
+
+          this.comentarios$ = this.publicacionesService.obtenerComentarios(this.publicacionSeleccionada._id);
+
           this.nuevoComentario = '';
         },
-        error: (err) => console.error("Error agregando comentario:", err)
+        error: (err) => {
+          console.error("Error agregando comentario:", err);
+          this.toastr.error("No se pudo agregar el comentario", "Error");
+        }
+      });
+  }
+  eliminarComentario(publicacionId: string, comentarioId: string) {
+    this.publicacionesService
+      .eliminarComentario(publicacionId, comentarioId)
+      .subscribe({
+        next: () => {
+          this.comentarios$ = this.publicacionesService.obtenerComentarios(publicacionId);
+
+          this.toastr.success('Comentario eliminado correctamente', 'Éxito');
+        },
+        error: (err) => {
+          console.error("Error eliminando comentario:", err);
+          this.toastr.error("No puedes eliminar este comentario", "Error");
+        }
+      });
+  }
+  eliminarPublicacion(publicacionId: string) {
+    this.publicacionesService
+      .eliminarPublicacion(publicacionId)
+      .subscribe({
+        next: () => {
+          this.toastr.success('Publicación eliminada correctamente', 'Éxito');
+          if (this.publicaciones && this.publicaciones.length > 0) {
+            this.publicaciones = this.publicaciones.filter(
+              (pub: any) => pub._id !== publicacionId
+            );
+          }
+
+          this.publicacionSeleccionada = null;
+          this.cerrarModal();
+        },
+        error: (err) => {
+          console.error('Error eliminando publicación:', err);
+          alert('No puedes eliminar esta publicación');
+        }
       });
   }
 
-  constructor() {}
-
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
-      if (params['userId']) {
-        this.filtros.userId = params['userId'];
-      }
-      this.cargarPublicaciones();
-    });
+    this.cargarPublicaciones();
   }
 
   onFileSelected(event: any) {
@@ -96,10 +127,6 @@ export class Publicaciones implements OnInit {
       offset: this.filtros.offset,
       limit: this.filtros.limit,
     };
-
-    if (this.filtros.userId && this.filtros.userId.trim()) {
-      opts.userId = this.filtros.userId;
-    }
 
     this.publicacionesService.obtenerPublicaciones(opts).subscribe({
       next: (datos: any) => {
@@ -120,9 +147,8 @@ export class Publicaciones implements OnInit {
 
   resetearFiltros() {
     this.filtros.sort = 'date';
-    this.filtros.userId = '';
     this.filtros.offset = 0;
-    this.filtros.limit = 20;
+    this.filtros.limit = 10;
     this.cargarPublicaciones();
   }
 
@@ -144,13 +170,13 @@ export class Publicaciones implements OnInit {
     formData.append('titulo', form.titulo ?? '');
     formData.append('descripcion', form.contenido ?? '');
     formData.append('usuario', usuario.resultado['usuario'].nombreUsuario);
+    formData.append('usuarioId', usuario.resultado['usuario']._id);
     formData.append('urlImagen', this.imagenSeleccionada); 
 
     this.publicacionesService.subirPublicacion(formData).subscribe({
       next: () => {
         console.log('Publicación subida con éxito');
 
-        // Reset form y file
         this.postForm.reset();
         this.imagenSeleccionada = null;
 
@@ -185,13 +211,7 @@ export class Publicaciones implements OnInit {
 
     this.publicacionesService.toggleLike(pub._id).subscribe({
       next: (res: any) => {
-        // actualiza el numero de likes
-        pub.likesCantidad = res.likes;
 
-        // marca si ya está likeado
-        pub.likeado = res.likeado;
-
-        // si querés actualizar el array completo de likes:
         if (res.likeado) {
           pub.likes.push(nombreUsuario);
         } else {

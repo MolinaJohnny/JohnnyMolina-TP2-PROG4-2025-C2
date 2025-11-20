@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Usuario } from './entities/usuario.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UsuariosService {
@@ -25,21 +25,38 @@ export class UsuariosService {
     return todos;
   }
 
-  findOne(id: string) {
-    const resultado = this.instModel.findById(id);
+  async findOne(id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID de usuario inválido');
+    }
+    const resultado = await this.instModel.findById(id);
+    if (!resultado) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
     return resultado;
   }
 
   async update(id: string, updateUsuarioDto: UpdateUsuarioDto) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID de usuario inválido');
+    }
+    const usuario = await this.instModel.findById(id);
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
     console.log(updateUsuarioDto);
-    const resultado = await this.instModel.updateOne(
-      { _id: id },
-      updateUsuarioDto,
-    );
+    const resultado = await this.instModel.findByIdAndUpdate(id, updateUsuarioDto, { new: true });
     return resultado;
   }
 
   async remove(id: string) {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID de usuario inválido');
+    }
+    const usuario = await this.instModel.findById(id);
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
     const resultado = await this.instModel.deleteOne({ _id: id });
     return resultado;
   }

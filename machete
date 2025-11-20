@@ -1,0 +1,79 @@
+    // GUARDAR Y CARGAR EN CSV
+    
+    public void guardar(String archivo, List<T> objetos) throws IOException {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivo))) {
+            for (T obj : objetos) {
+                bw.write(obj.toCSV());
+                bw.newLine();
+            }
+        }
+    }
+    
+    
+
+    public List<String> cargar(String archivo) throws IOException {
+     
+        List<String> lineas = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+          
+            while ((linea = br.readLine()) != null) {
+                lineas.add(linea);
+            }
+         
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+        return lineas;
+    }
+    //   GUARDAR Y CARGAR BINARIO
+    public static void guardarBinario(String archivo, List<Persona> objetos) throws IOException {
+    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(archivo))) {
+        oos.writeObject(objetos);
+    }
+    }
+    public static List<Persona> cargarBinario(String archivo) {
+    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
+        return (List<Persona>) ois.readObject();
+    } catch (Exception e) {
+        System.out.println("Error al leer binario: " + e.getMessage());
+        return new ArrayList<>();
+    }
+    }
+
+
+    //      GUARDAR Y CARGAR JSON
+
+    private static List<Persona> cargarJSON(String archivo) {
+    List<Persona> personas = new ArrayList<>();
+
+    try (Reader reader = new FileReader(archivo)) {
+
+        Gson gson = new Gson();
+
+        // Deserializa directamente a un array de Persona
+        Persona[] arrayPersonas = gson.fromJson(reader, Persona[].class);
+
+        // Convertimos el array a lista
+        if (arrayPersonas != null) {
+            personas = Arrays.asList(arrayPersonas);
+        }
+
+        System.out.println("Personas deserializadas desde JSON");
+
+    } catch (IOException e) {
+        System.out.println("Error al leer JSON: " + e.getMessage());
+    }
+
+    return personas;
+    }
+    ////////////////////////////////////////////////////////////////
+    
+    public void guardarJSON(String archivo, List<T> objetos) throws IOException {
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    String json = gson.toJson(objetos);
+
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivo))) {
+        bw.write(json);
+    }
+    }

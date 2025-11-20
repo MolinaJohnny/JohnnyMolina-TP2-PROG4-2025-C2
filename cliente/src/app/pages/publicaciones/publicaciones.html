@@ -54,8 +54,10 @@
         <div class="d-flex flex-column gap-2 publicacion-botones">
           <button class="btn btn-sm btn-outline-secondary" (click)="abrirModal(pub)">Ver</button>
           <button (click)="likear(pub)" [ngClass]="pub.likeado ? 'btn btn-primary' : 'btn btn-outline-primary'">
-            👍 {{ pub.likes?.length || 0 }}
+            ❤️{{ pub.likes?.length || 0 }}
           </button>
+
+          <button class="btn btn-sm btn-outline-secondary" (click)="eliminarPublicacion( pub._id)">Eliminar</button>
         </div>
       </div>
     </div>
@@ -66,26 +68,29 @@
   <div class="modal-dialog" (click)="$event.stopPropagation()">
     <div class="modal-content" *ngIf="publicacionSeleccionada">
       <div class="modal-header">
-        <h5 class="modal-title">{{ publicacionSeleccionada.titulo }}</h5>
+        <h5 class="modal-title text-center w-100">{{ publicacionSeleccionada.titulo }}</h5>
         <button type="button" class="btn-close" aria-label="Close" (click)="cerrarModal($event)"></button>
       </div>
       <div class="modal-body">
         <p>{{ publicacionSeleccionada.descripcion }}</p>
         <img *ngIf="publicacionSeleccionada.urlImagen" [src]="rutaImagen" class="img-fluid mb-2">
 
-        <!-- Comentarios existentes -->
-        <div *ngIf="publicacionSeleccionada.comentarios?.length > 0" class="mb-2">
-          <h6>Comentarios:</h6>
-          <div *ngFor="let c of publicacionSeleccionada.comentarios">
-            <strong>{{ c.usuario }}:</strong> {{ c.contenido }}
-          </div>
-        </div>
-
-        <!-- Formulario para agregar comentario -->
         <div class="mt-3">
           <input type="text" class="form-control" placeholder="Escribir comentario..." [(ngModel)]="nuevoComentario" name="comentario" />
           <button type="button" class="btn btn-primary btn-sm mt-2" (click)="agregarComentario()">Comentar</button>
         </div>
+        <!-- Comentarios existentes -->
+        <div *ngIf="publicacionSeleccionada.comentarios?.length > 0" class="mb-2">
+          <h6 class="mt-3">Comentarios:</h6>
+          <div *ngFor="let comentario of comentarios$ | async" class="border rounded p-2 mb-2 bg-light">
+            <strong class="d-block mb-1">{{ comentario.usuario?.nombreUsuario }}</strong>
+            <p class="mb-0">{{ comentario.contenido }}</p>
+            <button class="">Editar</button>
+            <button class="" (click)="eliminarComentario(publicacionSeleccionada._id, comentario._id)">Eliminar</button>
+          </div>
+        </div>
+
+        <!-- Formulario para agregar comentario -->
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="cerrarModal($event)">Cerrar</button>
@@ -98,6 +103,6 @@
   <div class="d-flex justify-content-center gap-2 mt-4" *ngIf="publicaciones.length > 0">
     <button class="btn btn-outline-primary" (click)="paginaAnterior()" [disabled]="filtros.offset === 0">← Anterior</button>
     <span class="d-flex align-items-center px-2">Página {{ (filtros.offset / filtros.limit) + 1 }}</span>
-    <button class="btn btn-outline-primary" (click)="paginaSiguiente()" [disabled]="publicaciones.length < filtros.limit">Siguiente →</button>
+    <button class="btn btn-outline-primary" (click)="paginaSiguiente()" [disabled]="publicaciones.length">Siguiente →</button>
   </div>
 </div>

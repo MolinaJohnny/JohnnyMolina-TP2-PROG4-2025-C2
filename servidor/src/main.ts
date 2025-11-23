@@ -18,6 +18,7 @@ async function bootstrap() {
     origin: [
       'https://johnny-molina-tp-2-prog-4-2025-c2-2iax6x29o.vercel.app',
       'http://localhost:4200',
+      /\.vercel\.app$/,
     ],
     credentials: true,
   });

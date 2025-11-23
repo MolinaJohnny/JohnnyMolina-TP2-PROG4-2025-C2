@@ -70,8 +70,8 @@ export class AuthController {
   logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie('token', {
       httpOnly: true,
-      sameSite: 'strict',
-      secure: false,
+      sameSite: 'none',
+      secure: true,
     });
     return { ok: true };
   }

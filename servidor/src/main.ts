@@ -16,9 +16,8 @@ async function bootstrap() {
   );
   app.enableCors({
     origin: [
-      'https://johnny-molina-tp-2-prog-4-20-git-512958-johnny-molinas-projects.vercel.app',
+      'https://johnny-molina-tp-2-prog-4-2025-c2-2iax6x29o.vercel.app',
       'http://localhost:4200',
-      'johnny-molina-tp-2-prog-4-2025-c2-5zqxdhao7.vercel.app',
     ],
     credentials: true,
   });

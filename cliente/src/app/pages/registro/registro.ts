@@ -3,6 +3,8 @@ import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validator
 import { NgIf } from '@angular/common';
 import { Auth } from '../../services/auth';
 import { SessionService } from '../../services/session.service';
+import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-registro',
@@ -13,6 +15,7 @@ import { SessionService } from '../../services/session.service';
 export class Registro {
   selectedFile: File | null = null;
   imagenUrl: string = '';
+  constructor(private toastr: ToastrService){}
 
   registroForm = new FormGroup({
     nombre: new FormControl('', [Validators.required, Validators.minLength(2)]),
@@ -25,6 +28,7 @@ export class Registro {
     imagenUrl: new FormControl(''),
     perfil: new FormControl('usuario'),
   });
+  router = inject(Router);
 
   auth = inject(Auth);
   session = inject(SessionService);
@@ -54,16 +58,25 @@ export class Registro {
     this.auth.register(formData).subscribe({
       next: (resp: any) => {
         console.log('Registro exitoso', resp);
-        this.auth.authState.set(true);
-        this.session.start(10);
+        this.toastr.success('Registro exitoso', 'Éxito');
+        this.router.navigate(['/login']);
+
       },
       error: (err) => {
-        console.error('Error en registro', err);
-        alert('Error al registrar');
+        console.error('Error interno', err);
+
+        if(err.error["message"] == "El nombre de usuario ya existe"){
+          this.toastr.error(err.error["message"], "404");
+        }
+        if(err.error["message"] == "El correo electrónico ya está registrado"){
+        this.toastr.error(err.error["message"], "404");}
+        else{
+          this.toastr.error("Error en el servidor", "500");
+        }
       }
     });
   } else {
-    alert('Completa todos los campos e incluye una imagen');
+        this.toastr.error("Completa todos los campos correctamente", "404");
   }
 }
 

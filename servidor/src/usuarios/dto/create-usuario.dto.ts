@@ -28,5 +28,5 @@ export class CreateUsuarioDto {
 
   imagenUrl?: string;
   @IsString()
-  perfil: string;
+  perfil?: string;
 }

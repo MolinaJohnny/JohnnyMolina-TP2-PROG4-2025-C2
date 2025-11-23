@@ -36,3 +36,17 @@
   font-size: 15px;
   opacity: 0.8;
 }
+.publicaciones-container {
+
+  max-height: 400px;      /* podés ajustar este valor */
+  overflow-y: auto;
+
+  padding-right: 10px;    
+}
+.pub-imagen {
+  width: 120px;        /* tamaño pequeño */
+  height: 120px;       /* cuadrada */
+  object-fit: cover;   /* evita deformaciones */
+  border-radius: 8px;  /* bordes redondeados */
+  margin-top: 10px;
+}

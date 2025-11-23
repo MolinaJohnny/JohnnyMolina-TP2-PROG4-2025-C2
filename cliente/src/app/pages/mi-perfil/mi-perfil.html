@@ -14,3 +14,16 @@
 
   </div>
 </div>
+<div class="publicaciones-container mt-4" *ngIf="publicaciones && publicaciones.length > 0">
+  <h2 class="mb-3">Publicaciones</h2>
+
+  <div class="publicacion card p-3 mb-3" *ngFor="let pub of publicaciones">
+    <h3 class="fw-bold">{{ pub.titulo }}</h3>
+    <p class="mt-2">{{ pub.descripcion }}</p>
+    <img [src]="environment.apiUrl + pub.urlImagen" alt="Imagen de la publicación" class="pub-imagen" *ngIf="pub.urlImagen">
+  </div>
+</div>
+
+<div *ngIf="publicaciones?.length === 0" class="text-center mt-4">
+  <p>No hay publicaciones para mostrar.</p>
+</div>

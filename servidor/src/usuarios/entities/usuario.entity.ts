@@ -29,7 +29,7 @@ export class Usuario {
 
   @Prop()
   imagenUrl: string;
-
+  @Prop({ required: true, default: 'usuario' })
   perfil: string;
 
   @Prop({ type: [Types.ObjectId], ref: 'Publicacione', default: [] })

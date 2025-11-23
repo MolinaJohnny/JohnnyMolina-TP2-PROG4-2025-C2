@@ -31,7 +31,7 @@ export class PublicacionesService {
       const match: any = { eliminada: false };
 
       const skip = typeof opts?.offset === 'number' ? opts.offset : 0;
-      const limit = typeof opts?.limit === 'number' ? opts.limit : 20;
+      const limit = typeof opts?.limit === 'number' ? opts.limit : 4;
 
       if (opts?.sort === 'likes') {
         const pipeline: any[] = [
@@ -50,7 +50,6 @@ export class PublicacionesService {
         return resultados;
       }
 
-      // default: sort by creation date descending (nuevas -> viejas)
       const publicaciones = await this.instModel
         .find(match)
         .sort({ fechaCreacion: -1 })
@@ -68,6 +67,23 @@ export class PublicacionesService {
   }
   findOne(id: number) {
     return `This action returns a #${id} publicacione`;
+  }
+  async buscarPorUsuario(usuarioId: string) {
+    try {
+      const match: any = { eliminada: false };
+      const limit = 3;
+      const publicaciones = await this.instModel
+        .find({ ...match, usuarioId: usuarioId })
+        .sort({ fechaCreacion: -1 })
+        .limit(limit)
+        .exec();
+      return publicaciones;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'No se pudieron obtener las publicaciones del usuario',
+      );
+      console.error('Error al traer las publicaciones del usuario:', error);
+    }
   }
 
   async findOneById(id: string) {

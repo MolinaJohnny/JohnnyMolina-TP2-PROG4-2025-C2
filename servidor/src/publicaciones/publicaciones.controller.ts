@@ -79,6 +79,10 @@ export class PublicacionesController {
 
     return this.publicacionesService.findAll(opts);
   }
+  @Get('/porUsuario/:usuarioId')
+  buscarPorUsuario(@Param('usuarioId') usuarioId: string) {
+    return this.publicacionesService.buscarPorUsuario(usuarioId);
+  }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {

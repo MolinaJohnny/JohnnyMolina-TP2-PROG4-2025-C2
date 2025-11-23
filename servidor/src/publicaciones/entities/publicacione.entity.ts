@@ -18,7 +18,7 @@ export class Publicacione {
   @Prop({ type: Types.ObjectId, ref: 'Usuario', required: true })
   usuario: Types.ObjectId;
 
-  @Prop({ default: new Date() })
+  @Prop({ default: () => new Date() })
   fechaCreacion: Date;
 
   @Prop({ default: false })
@@ -43,7 +43,8 @@ export class Comentario {
   contenido: string;
   @Prop({ default: false })
   modificado: boolean;
-
+  @Prop({ default: () => new Date() })
+  fechaCreacion: Date;
   @Prop({ type: Types.ObjectId, ref: 'Usuario', required: true })
   usuario: { type: mongoose.Schema.Types.ObjectId; ref: 'Usuario' };
 

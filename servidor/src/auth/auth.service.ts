@@ -128,6 +128,7 @@ export class AuthService {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
+    // Generar token con la id incluida
     const token = this.guardarEnCookie(
       usuario.nombreUsuario,
       usuario.imagenUrl,

@@ -54,4 +54,9 @@ export class PublicacionesService {
       { withCredentials: true }
     );
   }
+  porUsuario(usuarioId: string) {
+    return this.httpClient.get<any[]>(`${environment.apiUrl}/publicaciones/porUsuario/${usuarioId}`,
+          { withCredentials: true } 
+    );
+  }
 }

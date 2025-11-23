@@ -19,7 +19,7 @@ export class SessionService {
     this.stop();
     this.durationMinutes = minutes;
     // modificar para que avise 3 minutos antes
-    const warningMs = Math.max(0, (minutes - 3)) * 60 * 1000; 
+    const warningMs = Math.max(0, (minutes - 4)) * 60 * 1000; 
     const expiryMs = minutes * 60 * 1000;
 
     // Si minutes=10, warningMs = 5min

@@ -46,7 +46,7 @@ export class Login {
       next: (resp) => {
         console.log('logueo test ok', resp);
         this.auth.authState.set(true);
-        this.session.start(10);
+        this.session.start(5);
         this.router.navigate(['/publicaciones']);
       },
       error: (err) => {

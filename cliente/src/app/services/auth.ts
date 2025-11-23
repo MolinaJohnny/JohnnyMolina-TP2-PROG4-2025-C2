@@ -23,7 +23,7 @@ export class Auth {
       withCredentials: true,
     })
     const data : any = await firstValueFrom(observable)
-    console.log("Data cookie obtenida:", data);
+    console.log("Data cookie obtenida auth.ts:", data.resultado.usuario._id);
     return data;
   }
   register(usuario: FormData) {

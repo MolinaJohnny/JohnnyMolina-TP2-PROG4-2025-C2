@@ -7,7 +7,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.useStaticAssets(join(__dirname, '..', 'public')); // <= clave
+  app.useStaticAssets(join(__dirname, '..', 'public'));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -16,9 +16,9 @@ async function bootstrap() {
   );
   app.enableCors({
     origin: [
+      'https://johnny-molina-tp-2-prog-4-20-git-512958-johnny-molinas-projects.vercel.app',
       'http://localhost:4200',
       'johnny-molina-tp-2-prog-4-2025-c2-5zqxdhao7.vercel.app',
-      'https://johnny-molina-tp-2-prog-4-20-git-512958-johnny-molinas-projects.vercel.app',
     ],
     credentials: true,
   });

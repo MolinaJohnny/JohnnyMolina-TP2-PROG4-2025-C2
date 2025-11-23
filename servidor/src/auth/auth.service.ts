@@ -104,8 +104,8 @@ export class AuthService {
   setCookie(response: Response, token: string, minutes = 15) {
     response.cookie('token', token, {
       httpOnly: true,
-      sameSite: 'strict',
-      secure: false,
+      sameSite: 'none',
+      secure: true,
       expires: new Date(Date.now() + minutes * 60 * 1000),
     });
   }

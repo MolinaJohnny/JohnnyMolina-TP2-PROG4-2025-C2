@@ -29,10 +29,6 @@ export class Auth {
   register(usuario: FormData) {
     return this.httpClient.post(`${environment.apiUrl}/auth/register`, usuario);
   }
-
-  login(usuario: Usuario) {
-    return this.httpClient.post(`${environment.apiUrl}/auth/login`, usuario);
-  }
   //validar cookie
   async checkAuth() {
     try {

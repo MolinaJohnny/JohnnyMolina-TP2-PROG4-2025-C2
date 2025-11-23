@@ -68,11 +68,11 @@
                 <h3 class="mb-0">Cover</h3>
 
                 <nav class="nav nav-masthead">
-                    <button class="nav-link fw-bold py-1 px-0 active" routerLink="publicaciones">Publicaciones</button>
+                    <button *ngIf="isAuthenticated()" class="nav-link fw-bold py-1 px-0 active" routerLink="publicaciones">Publicaciones</button>
                     <button *ngIf="!(isAuthenticated())" class="nav-link fw-bold py-1 px-0" routerLink="login"> Login</button>
                     <button *ngIf="!(isAuthenticated())" class="nav-link fw-bold py-1 px-0" routerLink="registro"> Registro</button>
                     <button *ngIf="isAuthenticated()" class="nav-link fw-bold py-1 px-0" type="button" (click)="logout()">Cerrar sesión</button>
-                    <button class="nav-link fw-bold py-1 px-0" routerLink="mi-perfil"> Mi perfil</button>
+                    <button *ngIf="isAuthenticated()" class="nav-link fw-bold py-1 px-0" routerLink="mi-perfil"> Mi perfil</button>
                 </nav>
             </div>
         </header>

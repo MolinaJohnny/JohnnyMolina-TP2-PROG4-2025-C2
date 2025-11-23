@@ -22,11 +22,11 @@ export class App implements OnInit {
 
   ngOnInit() {
     setTimeout(() => {
-      this.validateAndShowContent();
+      this.validar();
     }, 2000);
   }
 
-  async validateAndShowContent() {
+  async validar() {
     try {
       const data = await this.auth.dataCookie();
       

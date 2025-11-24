@@ -15,7 +15,7 @@ export class SessionService {
     
   // modificar minutes para que avise 3 minutos antes
 
-  start(minutes = 5) {
+  start(minutes: number) {
     this.stop();
     this.durationMinutes = minutes;
     // modificar para que avise 3 minutos antes
@@ -25,7 +25,7 @@ export class SessionService {
     // Si minutes=10, warningMs = 5min
     this.warningTimer = setTimeout(() => this.promptExtend(), warningMs);
     this.expiryTimer = setTimeout(() => this.onExpiry(), expiryMs);
-    console.log('Session timers started: warning in', warningMs, 'ms, expiry in', expiryMs, 'ms');
+    console.log('Timers iniciados: alerta en: ', warningMs, 'ms, token expira en: ', expiryMs, 'ms');
   }
 
   stop() {

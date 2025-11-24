@@ -4,6 +4,7 @@ import { NgIf } from '@angular/common';
 import { Auth } from '../../services/auth';
 import { Router } from '@angular/router';
 import { SessionService } from '../../services/session.service';
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, NgIf],
@@ -15,7 +16,7 @@ export class Login {
     nombreUsuario: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)])
   });
-
+  constructor(private toastr: ToastrService) {}
   auth = inject(Auth);
   router = inject(Router);
   session = inject(SessionService);
@@ -32,7 +33,7 @@ export class Login {
         },
         error: (err) => {
           console.error('Error en login cookie:', err);
-          alert('Error al iniciar sesión');
+          this.toastr.error('Nombre de usuario o contraseña incorrectos', '401');
           this.auth.authState.set(false);
         }
       });
@@ -46,11 +47,12 @@ export class Login {
       next: (resp) => {
         console.log('logueo test ok', resp);
         this.auth.authState.set(true);
-        this.session.start(5);
+        this.session.start(10);
         this.router.navigate(['/publicaciones']);
       },
       error: (err) => {
         console.error('logueo test err', err);
+        this.toastr.error('Error en el inicio de sesión de prueba', 'Error');
         this.auth.authState.set(false);
       }
     });

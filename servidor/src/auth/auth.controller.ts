@@ -63,7 +63,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const resultado = await this.authService.loginCookie(body);
-    this.authService.setCookie(response, resultado.token, 15);
+    this.authService.setCookie(response, resultado.token, 10);
     response.json({ resultado });
   }
   @Post('logout')
@@ -93,6 +93,7 @@ export class AuthController {
           urlImagen: datos.Url,
           descripcion: datos.descripcion,
           _id: datos.id,
+          perfil: datos.perfil,
         },
       },
     };
@@ -114,9 +115,10 @@ export class AuthController {
       datos.Url,
       datos.descripcion,
       datos.id,
+      datos.perfil,
     );
 
-    this.authService.setCookie(response, nuevoToken, 15);
+    this.authService.setCookie(response, nuevoToken, 10);
 
     return { token: nuevoToken };
   }

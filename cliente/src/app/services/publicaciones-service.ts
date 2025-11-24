@@ -59,4 +59,9 @@ export class PublicacionesService {
           { withCredentials: true } 
     );
   }
+  editarComentario(comentarioId: string, contenido: string) { 
+    return this.httpClient.put<any[]>(`${environment.apiUrl}/publicaciones/comentarios/${comentarioId}`, { contenido },
+          { withCredentials: true }  
+    );
+  } 
 }

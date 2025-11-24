@@ -23,7 +23,6 @@ export class MiPerfil implements OnInit {
 
   async ngOnInit() {
 
-    const backendUrl = 'http://localhost:3000';  // Reemplazar según corresponda
     const userActual: any = await this.auth.dataCookie();
     this.cargarPublicaciones();
     console.log(userActual.resultado.usuario.urlImagen) 

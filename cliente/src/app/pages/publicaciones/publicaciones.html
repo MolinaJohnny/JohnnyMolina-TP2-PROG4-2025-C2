@@ -58,7 +58,7 @@
             ❤️{{ pub.likes?.length || 0 }}
           </button>
 
-          <button class="btn btn-sm btn-outline-secondary" (click)="eliminarPublicacion( pub._id)">Eliminar</button>
+          <button *ngIf="usuarioPerfil == 'admin' || usuarioID == pub.usuarioId " class="btn btn-sm btn-outline-secondary" (click)="eliminarPublicacion( pub._id)">Eliminar</button>
         </div>
       </div>
     </div>
@@ -82,11 +82,39 @@
         </div>
         <div *ngIf="publicacionSeleccionada.comentarios?.length > 0" class="mb-2">
           <h6 class="mt-3">Comentarios:</h6>
+
           <div *ngFor="let comentario of comentarios$ | async" class="border rounded p-2 mb-2 bg-light">
-            <strong class="d-block mb-1">{{ comentario.usuario?.nombreUsuario }}</strong>
-            <p class="mb-0">{{ comentario.contenido }}</p>
-            <button class="">Editar</button>
-            <button class="" (click)="eliminarComentario(publicacionSeleccionada._id, comentario._id)">Eliminar</button>
+
+            <strong class="d-block mb-1 d-flex align-items-start"> Usuario: {{ comentario.usuario?.nombreUsuario }} <p *ngIf="comentario.modificado == true" class=" d-flex align-items-end">  (Editado)</p></strong>
+              
+
+            <!-- Modo edición -->
+            <div *ngIf="comentario._id === comentarioEditando; else modoLectura">
+              <input type="text"
+                    [(ngModel)]="contenidoEditando"
+                    class="form-control mb-2"
+                    (keyup.enter)="confirmarEdicion(comentario)"
+                    autofocus>
+
+              <button class="btn btn-sm btn-success me-2" (click)="confirmarEdicion(comentario)">Guardar</button>
+              <button class="btn btn-sm btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
+            </div>
+
+            <!-- Modo lectura -->
+            <ng-template #modoLectura>
+
+              <p class="mb-1 d-flex align-items-start">{{ comentario.contenido }}</p>
+              <div class="d-flex justify-content-end">
+              <button class="btn btn-sm btn-outline-primary me-2 "
+                      (click)="activarEdicion(comentario)">Editar</button>
+
+              <button class="btn btn-sm btn-outline-danger"
+                      (click)="eliminarComentario(publicacionSeleccionada._id, comentario._id)">
+                Eliminar
+              </button>
+              </div>
+            </ng-template>
+
           </div>
         </div>
 

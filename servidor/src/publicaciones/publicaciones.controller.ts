@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Controller,
@@ -12,6 +13,7 @@ import {
   BadRequestException,
   UseGuards,
   Query,
+  Put,
 } from '@nestjs/common';
 import { PublicacionesService } from './publicaciones.service';
 import { CreatePublicacioneDto } from './dto/create-publicacione.dto';
@@ -91,7 +93,11 @@ export class PublicacionesController {
   @UseGuards(JwtCookieGuard)
   @Delete(':id')
   eliminarPublicacion(@Param('id') id: string, @Req() req: any) {
-    return this.publicacionesService.eliminarPublicacion(id, req.user.id);
+    return this.publicacionesService.eliminarPublicacion(
+      id,
+      req.user.id,
+      req.user.perfil,
+    );
   }
   @Post(':id/reactivate')
   reactivate(@Param('id') id: string, @Req() req: Request) {
@@ -134,7 +140,24 @@ export class PublicacionesController {
   @UseGuards(JwtCookieGuard)
   @Delete('/comentarios/:id')
   async borrarComentario(@Param('id') id: string, @Req() req: Request) {
-    return await this.publicacionesService.eliminarComentario(id, req.user.id);
+    return await this.publicacionesService.eliminarComentario(
+      id,
+      req.user.id,
+      req.user.perfil,
+    );
   }
   //Put de comentario
+  @UseGuards(JwtCookieGuard)
+  @Put('/comentarios/:id')
+  async editarComentario(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Body('contenido') contenido: string,
+  ) {
+    return await this.publicacionesService.editarComentario(
+      id,
+      req.user.id,
+      contenido,
+    );
+  }
 }

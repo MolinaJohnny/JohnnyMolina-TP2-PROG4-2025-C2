@@ -97,43 +97,6 @@ export class PublicacionesService {
     return publicacion;
   }
 
-  async remove(id: string, usuarioId: string) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('ID de publicación inválido');
-    }
-
-    if (!Types.ObjectId.isValid(usuarioId)) {
-      throw new BadRequestException('ID de usuario inválido');
-    }
-
-    const publicacion = await this.instModel.findById(id);
-
-    if (!publicacion) {
-      throw new NotFoundException('Publicación no encontrada');
-    }
-
-    if (publicacion.usuario.toString() !== usuarioId) {
-      throw new ForbiddenException(
-        'No tienes permiso para eliminar esta publicación',
-      );
-    }
-
-    if (publicacion.eliminada) {
-      throw new BadRequestException('La publicación ya ha sido eliminada');
-    }
-
-    const resultado = await this.instModel.findByIdAndUpdate(
-      id,
-      {
-        eliminada: true,
-        fechaEliminacion: new Date(),
-      },
-      { new: true },
-    );
-
-    return resultado;
-  }
-
   async reactivate(id: string, usuarioId: string) {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('ID de publicación inválido');
@@ -243,14 +206,20 @@ export class PublicacionesService {
       .populate('usuario', 'nombreUsuario imagenUrl')
       .sort({ createdAt: -1 });
   }
-  async eliminarPublicacion(publicacionId: string, usuarioId: string) {
+  async eliminarPublicacion(
+    publicacionId: string,
+    usuarioId: string,
+    usuarioPerfil: string,
+  ) {
     const publicacion = await this.instModel.findById(publicacionId);
     if (!publicacion) {
       throw new NotFoundException('Publicación no encontrada');
     }
 
-    if (publicacion.usuarioId != usuarioId) {
-      throw new UnauthorizedException('No puedes eliminar esta publicación');
+    if (publicacion.usuarioId !== usuarioId && usuarioPerfil !== 'admin') {
+      throw new UnauthorizedException(
+        'No puedes eliminar esta publicación 401',
+      );
     }
 
     publicacion.eliminada = true;
@@ -258,17 +227,53 @@ export class PublicacionesService {
 
     return { ok: true, mensaje: 'Publicación marcada como eliminada' };
   }
-  async eliminarComentario(comentarioId: string, usuarioId: string) {
+  async eliminarComentario(
+    comentarioId: string,
+    usuarioId: string,
+    usuarioPerfil: string,
+  ) {
     const comentario = await this.comentarioModel.findById(comentarioId);
     if (!comentario) {
       throw new NotFoundException('Comentario no encontrado');
     }
     // eslint-disable-next-line @typescript-eslint/no-base-to-string
     const creadorComentario = comentario.usuario.toString();
-    if (creadorComentario !== usuarioId) {
+    if (creadorComentario !== usuarioId && usuarioPerfil !== 'admin') {
       throw new UnauthorizedException('No puedes eliminar este comentario');
     }
     await this.comentarioModel.deleteOne({ _id: comentarioId });
     return { ok: true, mensaje: 'Comentario eliminado correctamente' };
+  }
+  async editarComentario(
+    comentarioId: string,
+    usuarioId: string,
+    nuevoTexto: string,
+  ) {
+    // Buscar comentario
+    const comentario = await this.comentarioModel.findById(comentarioId);
+
+    if (!comentario) {
+      throw new NotFoundException('Comentario no encontrado');
+    }
+
+    // Verificar que el usuario sea el dueño del comentario
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+    if (comentario.usuario.toString() !== usuarioId.toString()) {
+      throw new ForbiddenException(
+        'No tienes permiso para editar este comentario',
+      );
+    }
+
+    // Editar el comentario
+    comentario.contenido = nuevoTexto;
+    comentario.set('modificado', true);
+
+    // Guardar cambios
+    await comentario.save();
+
+    return {
+      message: 'Comentario editado correctamente',
+      comentario,
+    };
   }
 }

@@ -40,6 +40,7 @@ export class JwtCookieGuard implements CanActivate {
         nombreUsuario: payload.user,
         imagenUrl: payload.Url,
         descripcion: payload.descripcion,
+        perfil: payload.perfil,
         ...payload,
       };
 

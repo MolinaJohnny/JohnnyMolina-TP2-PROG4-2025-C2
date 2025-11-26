@@ -53,6 +53,7 @@ export class AuthService {
       nuevoUsuario.descripcion,
       nuevoUsuario._id.toString(),
       nuevoUsuario.perfil,
+      nuevoUsuario.activo,
     );
   }
 
@@ -82,6 +83,7 @@ export class AuthService {
     descripcion: string,
     id: string,
     perfil: string,
+    activo: boolean,
   ) {
     const payload: {
       id: string;
@@ -89,12 +91,14 @@ export class AuthService {
       Url: string;
       descripcion: string;
       perfil: string;
+      activo: boolean;
     } = {
       id: id,
       user: userName,
       Url: imagenUrl,
       descripcion: descripcion,
       perfil: perfil,
+      activo: activo,
     };
 
     const token: string = sign(payload, this.contrasenaSecreta, {
@@ -137,6 +141,7 @@ export class AuthService {
       usuario.descripcion,
       usuario._id.toString(),
       usuario.perfil,
+      usuario.activo,
     );
 
     return {
@@ -151,6 +156,7 @@ export class AuthService {
         imagenUrl: usuario.imagenUrl,
         fechaCreacion: usuario.fechaCreacion,
         perfil: usuario.perfil,
+        activo: usuario.activo,
       },
     };
   }

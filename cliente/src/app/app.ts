@@ -18,25 +18,35 @@ export class App implements OnInit {
 
   isAuthenticated = this.auth.authState;
   isInitialized = this.auth.isInitialized;
+  
   showSplash = signal(true);
-
-  ngOnInit() {
+  usuarioActual : any;
+  async ngOnInit() {
     setTimeout(() => {
       this.validar();
     }, 2000);
+    const data = await this.auth.dataCookie();
+    if (data.resultado.usuario.activo === false) {
+    this.auth.clearToken();
+    this.router.navigate(['/login']);
+      }
+    this.usuarioActual = await data.resultado.usuario.perfil;
   }
 
   async validar() {
     try {
       const data = await this.auth.dataCookie();
-      
+
       if (data?.resultado?.token) {
         this.auth.authState.set(true);
       } else {
         this.auth.clearToken();
+        this.router.navigate(['/login']);
       }
     } catch (error: any) {
       this.auth.clearToken();
+      this.router.navigate(['/login']);
+
     }
     
     this.showSplash.set(false);
@@ -44,10 +54,13 @@ export class App implements OnInit {
   }
 
   logout() {
+
     this.auth.logout().subscribe({
       next: () => {
         this.auth.clearToken();
         this.router.navigate(['/login']);
+        window.location.reload();
+
       },
       error: (err) => {
         console.error('Error cerrando sesión en backend', err);
@@ -56,5 +69,6 @@ export class App implements OnInit {
 
       }
     });
+
   }
 }

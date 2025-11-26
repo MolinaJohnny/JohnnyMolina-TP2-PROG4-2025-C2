@@ -18,7 +18,7 @@ import {
 } from 'jsonwebtoken';
 
 @Injectable()
-export class JwtCookieGuard implements CanActivate {
+export class AdminGuard implements CanActivate {
   constructor(private readonly configService: ConfigService) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -42,12 +42,14 @@ export class JwtCookieGuard implements CanActivate {
         imagenUrl: payload.Url,
         descripcion: payload.descripcion,
         perfil: payload.perfil,
-        activo: payload.activo,
         ...payload,
       };
 
-      if (payload.activo === false) {
-        throw new ForbiddenException('Tu cuenta está dada de baja');
+      // Validar que el usuario sea admin
+      if (payload.perfil !== 'admin') {
+        throw new ForbiddenException(
+          'Acceso denegado: se requiere perfil de administrador',
+        );
       }
 
       return true;
@@ -59,7 +61,7 @@ export class JwtCookieGuard implements CanActivate {
         throw new HttpException('Token inválido o manipulado', 401);
       }
       if (error instanceof ForbiddenException) {
-        throw new ForbiddenException('Tu cuenta está dada de baja');
+        throw error;
       }
 
       throw new UnauthorizedException('Token inválido');

@@ -83,8 +83,6 @@ export class AuthController {
       throw new BadRequestException('Token no encontrado');
     }
     const datos: any = decode(token);
-    console.log(datos);
-
     return {
       resultado: {
         token,
@@ -94,6 +92,7 @@ export class AuthController {
           descripcion: datos.descripcion,
           _id: datos.id,
           perfil: datos.perfil,
+          activo: datos.activo,
         },
       },
     };
@@ -116,6 +115,7 @@ export class AuthController {
       datos.descripcion,
       datos.id,
       datos.perfil,
+      datos.activo,
     );
 
     this.authService.setCookie(response, nuevoToken, 10);

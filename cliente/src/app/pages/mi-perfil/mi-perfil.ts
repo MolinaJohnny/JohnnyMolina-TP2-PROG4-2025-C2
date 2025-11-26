@@ -30,7 +30,7 @@ export class MiPerfil implements OnInit {
       nombre: userActual.resultado.usuario.nombreUsuario,
       foto: environment.apiUrl+userActual.resultado.usuario.urlImagen,
 
-      descripcion: 'Desarrollador web apasionado por Angular y tecnologías modernas.'
+      descripcion: userActual.resultado.usuario.descripcion,
       
     };
     

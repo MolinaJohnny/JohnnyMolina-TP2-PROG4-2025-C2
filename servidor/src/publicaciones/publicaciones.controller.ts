@@ -24,7 +24,7 @@ import type { Request } from 'express';
 @Controller('publicaciones')
 export class PublicacionesController {
   constructor(private readonly publicacionesService: PublicacionesService) {}
-
+  @UseGuards(JwtCookieGuard)
   @Post('/subir')
   @UseInterceptors(
     FileInterceptor('urlImagen', {
@@ -56,7 +56,6 @@ export class PublicacionesController {
 
     return await this.publicacionesService.create(createPublicacioneDto);
   }
-
   @Get('/todas')
   findAll(
     @Query('sort') sort?: string,

@@ -21,7 +21,7 @@ export class Login {
   router = inject(Router);
   session = inject(SessionService);
 
-  enviarFormulario() {
+  async enviarFormulario() {
     if (this.loginForm.valid) {
       const { nombreUsuario, password } = this.loginForm.value;
       this.auth.loginCookie({ nombreUsuario: nombreUsuario ?? '', contrasena: password ?? '' }).subscribe({

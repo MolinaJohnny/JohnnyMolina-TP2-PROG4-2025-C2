@@ -16,6 +16,7 @@ export class Registro {
   selectedFile: File | null = null;
   imagenUrl: string = '';
   constructor(private toastr: ToastrService){}
+  router = inject(Router);
 
   registroForm = new FormGroup({
     nombre: new FormControl('', [Validators.required, Validators.minLength(2)]),
@@ -28,7 +29,6 @@ export class Registro {
     imagenUrl: new FormControl(''),
     perfil: new FormControl('usuario'),
   });
-  router = inject(Router);
 
   auth = inject(Auth);
   session = inject(SessionService);

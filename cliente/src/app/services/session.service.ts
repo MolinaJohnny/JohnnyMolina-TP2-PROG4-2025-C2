@@ -12,7 +12,7 @@ export class SessionService {
   private warningTimer: any = null;
   private expiryTimer: any = null;
   private durationMinutes = 10;
-    
+  
   // modificar minutes para que avise 3 minutos antes
 
   start(minutes: number) {

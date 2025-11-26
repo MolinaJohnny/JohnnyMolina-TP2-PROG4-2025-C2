@@ -32,6 +32,9 @@ export class Usuario {
   @Prop({ required: true, default: 'usuario' })
   perfil: string;
 
+  @Prop({ required: true, default: true })
+  activo: boolean;
+
   @Prop({ type: [Types.ObjectId], ref: 'Publicacione', default: [] })
   publicaciones: Types.ObjectId[];
 }

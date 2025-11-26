@@ -49,7 +49,11 @@ export class UsuariosService {
       throw new NotFoundException('Usuario no encontrado');
     }
     console.log(updateUsuarioDto);
-    const resultado = await this.instModel.findByIdAndUpdate(id, updateUsuarioDto, { new: true });
+    const resultado = await this.instModel.findByIdAndUpdate(
+      id,
+      updateUsuarioDto,
+      { new: true },
+    );
     return resultado;
   }
 
@@ -70,5 +74,23 @@ export class UsuariosService {
 
   findByNombreUsuario(nombreUsuario: string) {
     return this.instModel.findOne({ nombreUsuario });
+  }
+  async darDeBaja(id: string) {
+    const usuario = await this.instModel.findById(id);
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    usuario.activo = false;
+    return usuario.save();
+  }
+  async darDeAlta(id: string) {
+    const usuario = await this.instModel.findById(id);
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    usuario.activo = true;
+    return usuario.save();
   }
 }

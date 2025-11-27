@@ -29,4 +29,14 @@ export class AdminService {
             withCredentials: true,
         }); 
     }
+    traerPublicaciones() {
+        return this.httpClient.get(`${environment.apiUrl}/usuarios/pub`, {
+            withCredentials: true,
+            });
+    }
+    traerComentarios() {
+        return this.httpClient.get(`${environment.apiUrl}/usuarios/comentarios`, {
+            withCredentials: true,
+            });
+    }
 }

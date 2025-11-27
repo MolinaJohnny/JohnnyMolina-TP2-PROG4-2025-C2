@@ -27,7 +27,7 @@ export class Dashboard implements OnInit {
   modalAbierto = false;
   constructor( private toastr: ToastrService ) {}
   async ngOnInit() {
-    await this.traerUsuarios();
+    this.traerUsuarios();
   }
 
   onFileSelected(event: any) {

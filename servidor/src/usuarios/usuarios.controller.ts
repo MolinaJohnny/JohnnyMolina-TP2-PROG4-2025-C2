@@ -69,11 +69,6 @@ export class UsuariosController {
   findAll() {
     return this.usuariosService.findAll();
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usuariosService.findOne(id);
-  }
   @Post(':id/estado')
   @UseGuards(JwtCookieGuard, AdminGuard)
   update(@Param('id') id: string) {
@@ -83,5 +78,14 @@ export class UsuariosController {
   @UseGuards(JwtCookieGuard, AdminGuard)
   remove(@Param('id') id: string) {
     return this.usuariosService.darDeBaja(id);
+  }
+  @Get('/pub')
+  findAllPub() {
+    return this.usuariosService.findAllPub();
+  }
+  @UseGuards(JwtCookieGuard, AdminGuard)
+  @Get('/comentarios')
+  findAllCom() {
+    return this.usuariosService.findAllCom();
   }
 }

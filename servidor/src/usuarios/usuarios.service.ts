@@ -10,10 +10,16 @@ import { Usuario } from './entities/usuario.entity';
 import { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { PublicacionesService } from '../publicaciones/publicaciones.service';
+import {
+  Comentario,
+  Publicacione,
+} from 'src/publicaciones/entities/publicacione.entity';
 @Injectable()
 export class UsuariosService {
   constructor(
     @InjectModel(Usuario.name) private instModel: Model<Usuario>,
+    @InjectModel(Publicacione.name) private pubModel: Model<Publicacione>,
+    @InjectModel(Comentario.name) private comModel: Model<Comentario>,
     private readonly publicacionesService: PublicacionesService,
   ) {}
   async create(createUsuarioDto: CreateUsuarioDto) {
@@ -30,17 +36,6 @@ export class UsuariosService {
   async findAll() {
     const todos = await this.instModel.find();
     return todos;
-  }
-
-  async findOne(id: string) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('ID de usuario inválido');
-    }
-    const resultado = await this.instModel.findById(id);
-    if (!resultado) {
-      throw new NotFoundException('Usuario no encontrado');
-    }
-    return resultado;
   }
 
   async update(id: string, updateUsuarioDto: UpdateUsuarioDto) {
@@ -101,5 +96,13 @@ export class UsuariosService {
 
     usuario.activo = true;
     return usuario.save();
+  }
+  async findAllPub() {
+    const publicaciones = await this.pubModel.find();
+    return publicaciones;
+  }
+  async findAllCom() {
+    const comentarios = await this.comModel.find();
+    return comentarios;
   }
 }

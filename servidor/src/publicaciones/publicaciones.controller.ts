@@ -98,14 +98,6 @@ export class PublicacionesController {
       req.user.perfil,
     );
   }
-  @Post(':id/reactivate')
-  reactivate(@Param('id') id: string, @Req() req: Request) {
-    const usuarioData = (
-      req as unknown as Record<string, Record<string, unknown>>
-    )?.user;
-    const usuarioId = String(usuarioData?.id || usuarioData?._id);
-    return this.publicacionesService.reactivate(id, usuarioId);
-  }
   @Post(':id/like')
   @UseGuards(JwtCookieGuard)
   toggleLike(@Param('id') id: string, @Req() req: Request) {

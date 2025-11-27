@@ -96,43 +96,6 @@ export class PublicacionesService {
     }
     return publicacion;
   }
-
-  async reactivate(id: string, usuarioId: string) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('ID de publicación inválido');
-    }
-
-    if (!Types.ObjectId.isValid(usuarioId)) {
-      throw new BadRequestException('ID de usuario inválido');
-    }
-
-    const publicacion = await this.instModel.findById(id);
-
-    if (!publicacion) {
-      throw new NotFoundException('Publicación no encontrada');
-    }
-
-    if (publicacion.usuario.toString() !== usuarioId) {
-      throw new ForbiddenException(
-        'No tienes permiso para reactivar esta publicación',
-      );
-    }
-
-    if (!publicacion.eliminada) {
-      throw new BadRequestException('La publicación no está eliminada');
-    }
-
-    const resultado = await this.instModel.findByIdAndUpdate(
-      id,
-      {
-        eliminada: false,
-        fechaEliminacion: null,
-      },
-      { new: true },
-    );
-
-    return resultado;
-  }
   async toggleLike(publicacionId: string, nombreUsuario: string) {
     if (!Types.ObjectId.isValid(publicacionId)) {
       throw new BadRequestException('ID de publicación inválido');

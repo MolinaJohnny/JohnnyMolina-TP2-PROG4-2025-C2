@@ -1,11 +1,13 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Auth } from './auth';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class SessionService {
   auth = inject(Auth);
   toastr = inject(ToastrService);
+  router = inject(Router);
 
   showWarning = signal<boolean>(false);
 
@@ -65,6 +67,9 @@ export class SessionService {
 
   private onExpiry() {
     this.auth.clearToken();
+    //enviar a login
+    this.router.navigate(['/login']);
+
     this.toastr.warning('Tu sesión ha expirado', 'Sesión');
   }
 }

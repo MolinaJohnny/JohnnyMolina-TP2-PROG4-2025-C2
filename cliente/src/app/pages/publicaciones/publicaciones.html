@@ -83,7 +83,7 @@
         <div *ngIf="publicacionSeleccionada.comentarios?.length > 0" class="mb-2">
           <h6 class="mt-3">Comentarios:</h6>
 
-          <div *ngFor="let comentario of comentarios$ | async" class="border rounded p-2 mb-2 bg-light">
+          <div *ngFor="let comentario of comentariosArray" class="border rounded p-2 mb-2 bg-light">
 
             <strong class="d-block mb-1 d-flex align-items-start"> Usuario: {{ comentario.usuario?.nombreUsuario }} <p *ngIf="comentario.modificado == true" class=" d-flex align-items-end">  (Editado)</p></strong>
               

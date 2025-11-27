@@ -97,12 +97,31 @@ export class UsuariosService {
     usuario.activo = true;
     return usuario.save();
   }
-  async findAllPub() {
-    const publicaciones = await this.pubModel.find();
-    return publicaciones;
+  async findAllPub(dias?: number) {
+    if (!dias) {
+      return this.pubModel.find();
+    }
+    console.log('Dias recibidos:', dias);
+
+    const hoy = new Date();
+    const desde = new Date();
+    desde.setDate(hoy.getDate() - dias);
+
+    return this.pubModel.find({
+      fechaCreacion: { $gte: desde, $lte: hoy },
+    });
   }
-  async findAllCom() {
-    const comentarios = await this.comModel.find();
-    return comentarios;
+  async findAllCom(dias?: number) {
+    if (!dias) {
+      return this.comModel.find();
+    }
+
+    const hoy = new Date();
+    const desde = new Date();
+    desde.setDate(hoy.getDate() - dias);
+
+    return this.comModel.find({
+      fechaCreacion: { $gte: desde, $lte: hoy },
+    });
   }
 }

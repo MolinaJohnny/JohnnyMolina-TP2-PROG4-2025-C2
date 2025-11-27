@@ -1,11 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { AdminService } from '../../services/admin.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-estadisticas',
-  imports: [],
+  imports: [ReactiveFormsModule, FormsModule],
   templateUrl: './estadisticas.html',
   styleUrl: './estadisticas.css',
 })
@@ -14,31 +15,33 @@ export class Estadisticas implements OnInit {
   adminService = inject(AdminService);
 
   ngOnInit(): void {
-    this.crearGrafico();
-    this.traerPublicaciones();
-
+    this.traerPublicaciones();  
   }
-  datos = {};
-  chart: any; 
 
-  crearGrafico() {
+  tiempo = 5;
+  datos = {};
+  chart: any;
+
+  crearGrafico(labels: string[], values: number[]) {
+    if (this.chart) {
+      this.chart.destroy(); 
+    }
+
     this.chart = new Chart("miGrafico", {
       type: 'bar',
       data: {
-        labels: ['Rojo', 'Azul', 'Verde', 'Amarillo'],
+        labels: labels,
         datasets: [{
-          label: 'Cantidad',
-          data: [12, 19, 3, 5],
+          label: 'Cantidad de publicaciones',
+          data: values,
           borderWidth: 1,
-          backgroundColor: ['red','blue','green','yellow']
+          backgroundColor: ['red', 'blue', 'green', 'yellow']
         }]
       },
       options: {
         responsive: true,
         scales: {
-          y: {
-            beginAtZero: true
-          }
+          y: { beginAtZero: true }
         }
       }
     });
@@ -58,10 +61,16 @@ export class Estadisticas implements OnInit {
   //   });
   // }
   traerPublicaciones() {
-    this.adminService.traerPublicaciones().subscribe({
+    this.adminService.traerPublicaciones(this.tiempo).subscribe({
       next: (resp: any) => {
         this.datos = resp || [];
-        console.log(this.datos);
+        console.log("Publicaciones recibidas:", resp);
+        const dataProcesada = this.ordenarPub(resp);
+
+        const labels = dataProcesada.map(x => x.usuario);
+        const values = dataProcesada.map(x => x.cantidad);
+
+        this.crearGrafico(labels, values);
       },
       error: (err: any) => {
         console.error('Error al traer publicaciones', err);
@@ -70,37 +79,23 @@ export class Estadisticas implements OnInit {
   }
   ordenarPub(publicaciones: any[]) {
     const contador: Record<string, number> = {};
+    const ahora = new Date();
 
     publicaciones.forEach(pub => {
-      const usuario = pub.usuario;
+      const usuario = pub.usuario || "Desconocido";
+      const fechaPub = new Date(pub.fechaCreacion);
+      const diffDias = (ahora.getTime() - fechaPub.getTime()) / (1000 * 60 * 60 * 24);
 
-      if (!contador[usuario]) {
-        contador[usuario] = 1;
-      } else {
-        contador[usuario]++;
+      if (diffDias <= this.tiempo) {
+        contador[usuario] = (contador[usuario] || 0) + 1;
       }
     });
 
-    // Convertir a array
     return Object.keys(contador).map(usuario => ({
       usuario,
       cantidad: contador[usuario]
     }));
   }
   traercommentarios() {
-  }
-  ordenarDatos(datos: [] , criterio: string) {
-    const retorno = [];
-    switch (criterio) {
-      case 'comentario':
-        
-      case 'publicacion':
-        for(let u of datos){
-          retorno.push(u);}
-        break;
-      default:
-        console.warn('Criterio de ordenamiento no reconocido');
-    }
-    return datos;
   }
 }

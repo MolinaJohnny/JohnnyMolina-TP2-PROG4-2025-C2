@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   ParseFilePipe,
   MaxFileSizeValidator,
+  Query,
 } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -80,12 +81,11 @@ export class UsuariosController {
     return this.usuariosService.darDeBaja(id);
   }
   @Get('/pub')
-  findAllPub() {
-    return this.usuariosService.findAllPub();
+  findAllPub(@Query('dias') dias?: string) {
+    return this.usuariosService.findAllPub(Number(dias));
   }
-  @UseGuards(JwtCookieGuard, AdminGuard)
-  @Get('/comentarios')
-  findAllCom() {
-    return this.usuariosService.findAllCom();
+
+  findAllCom(@Query('dias') dias?: string) {
+    return this.usuariosService.findAllCom(Number(dias));
   }
 }

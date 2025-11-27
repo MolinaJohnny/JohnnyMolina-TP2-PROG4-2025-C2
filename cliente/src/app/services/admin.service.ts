@@ -29,14 +29,17 @@ export class AdminService {
             withCredentials: true,
         }); 
     }
-    traerPublicaciones() {
-        return this.httpClient.get(`${environment.apiUrl}/usuarios/pub`, {
-            withCredentials: true,
-            });
+    traerPublicaciones(dias?: number) {
+    return this.httpClient.get(`${environment.apiUrl}/usuarios/pub`, {
+        withCredentials: true,
+        params: dias ? { dias: dias } : {}
+    });
     }
-    traerComentarios() {
-        return this.httpClient.get(`${environment.apiUrl}/usuarios/comentarios`, {
-            withCredentials: true,
-            });
+
+    traerComentarios(dias?: number) {
+    return this.httpClient.get(`${environment.apiUrl}/usuarios/comentarios`, {
+        withCredentials: true,
+        params: dias ? { dias: dias } : {}
+    });
     }
 }

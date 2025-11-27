@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { HydratedDocument } from 'mongoose';
 import * as mongoose from 'mongoose';
-@Schema()
+@Schema({ timestamps: true })
 export class Publicacione {
   @Prop({ required: true })
   titulo: string;

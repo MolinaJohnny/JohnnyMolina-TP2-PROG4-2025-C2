@@ -10,7 +10,7 @@ import { from, map, Observable } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-publicaciones',
-  imports: [ReactiveFormsModule, NgFor, NgIf, FormsModule, NgClass, AsyncPipe],
+  imports: [ReactiveFormsModule, NgFor, NgIf, FormsModule, NgClass],
   templateUrl: './publicaciones.html',
   styleUrl: './publicaciones.css',
 })
@@ -41,8 +41,10 @@ export class Publicaciones implements OnInit {
   modalAbierto = false;
   publicacionSeleccionada: any = null;
   rutaImagen: string = "";
-  comentarios$!: Observable<any[]>;
+  comentarios!: Observable<any[]>;
   usuarioActual: any;
+  comentariosArray: any[] = [];
+
   usuarioPerfil: string = '';
   usuarioID: string = '';
   async ngOnInit() {
@@ -160,7 +162,12 @@ export class Publicaciones implements OnInit {
     this.modalAbierto = true;
     this.rutaImagen = environment.apiUrl + pub.urlImagen;
 
-    this.comentarios$ = this.publicacionesService.obtenerComentarios(pub._id);
+    this.publicacionesService.obtenerComentarios(pub._id).subscribe({
+      next: (lista: any[]) => {
+        this.comentariosArray = lista; 
+      },
+      error: (err) => console.error("Error cargando comentarios:", err)
+    });
   }
 
   cerrarModal(event?: Event) {
@@ -187,31 +194,31 @@ export class Publicaciones implements OnInit {
 
       //           COMENTARIOS
 
-  agregarComentario() {
-    if (!this.nuevoComentario.trim()) return;
+agregarComentario() {
+  if (!this.nuevoComentario.trim()) return;
 
-    this.publicacionesService
-      .agregarComentario(this.publicacionSeleccionada._id, this.nuevoComentario)
-      .subscribe({
-        next: () => {
-          this.toastr.info('Comentario agregado', 'Info');
+  this.publicacionesService
+    .agregarComentario(this.publicacionSeleccionada._id, this.nuevoComentario)
+    .subscribe({
+      next: (nuevoComentarioCreado: any) => {
 
-          this.comentarios$ = this.publicacionesService.obtenerComentarios(this.publicacionSeleccionada._id);
+        this.comentariosArray.push(nuevoComentarioCreado);
 
-          this.nuevoComentario = '';
-        },
-        error: (err) => {
-          console.error("Error agregando comentario:", err);
-          this.toastr.error("No se pudo agregar el comentario", "Error");
-        }
-      });
-  }
+        this.toastr.info('Comentario agregado', 'Info');
+        this.nuevoComentario = '';
+      },
+      error: (err) => {
+        console.error("Error agregando comentario:", err);
+        this.toastr.error("No se pudo agregar el comentario", "Error");
+      }
+    });
+}
   eliminarComentario(publicacionId: string, comentarioId: string) {
     this.publicacionesService
       .eliminarComentario(publicacionId, comentarioId)
       .subscribe({
         next: () => {
-          this.comentarios$ = this.publicacionesService.obtenerComentarios(publicacionId);
+          this.comentarios = this.publicacionesService.obtenerComentarios(publicacionId);
 
           this.toastr.success('Comentario eliminado correctamente', 'Éxito');
         },
@@ -232,7 +239,7 @@ export class Publicaciones implements OnInit {
       .editarComentario(comentario._id, this.contenidoEditando)
       .subscribe({
         next: () => {
-          this.comentarios$ = this.publicacionesService.obtenerComentarios(
+          this.comentarios = this.publicacionesService.obtenerComentarios(
             this.publicacionSeleccionada._id
           );
           this.cancelarEdicion(); // salir del modo edición

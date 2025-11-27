@@ -25,6 +25,8 @@ export class AdminService {
         });
     }
     cambiarBaja(usuarioId: string) {
-        return this.httpClient.delete(`${environment.apiUrl}/usuarios/${usuarioId}`, {  },); 
+        return this.httpClient.delete(`${environment.apiUrl}/usuarios/${usuarioId}`,{
+            withCredentials: true,
+        }); 
     }
 }

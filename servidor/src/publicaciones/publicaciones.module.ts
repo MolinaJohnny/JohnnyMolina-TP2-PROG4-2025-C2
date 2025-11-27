@@ -18,5 +18,6 @@ import {
   ],
   controllers: [PublicacionesController, ComentariosController],
   providers: [PublicacionesService],
+  exports: [PublicacionesService],
 })
 export class PublicacionesModule {}

@@ -16,6 +16,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { AdminGuard } from 'src/guards/admin/admin.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { JwtCookieGuard } from 'src/guards/jwt-cookie/jwt-cookie.guard';
 
 @Controller('usuarios')
 export class UsuariosController {
@@ -26,7 +27,7 @@ export class UsuariosController {
     return this.usuariosService.create(createUsuarioDto);
   }
   @Post('/crear-admin')
-  @UseGuards(AdminGuard)
+  @UseGuards(JwtCookieGuard, AdminGuard)
   @UseInterceptors(
     FileInterceptor('imagenUrl', {
       storage: diskStorage({
@@ -63,7 +64,7 @@ export class UsuariosController {
     };
   }
 
-  @UseGuards(AdminGuard)
+  @UseGuards(JwtCookieGuard, AdminGuard)
   @Get()
   findAll() {
     return this.usuariosService.findAll();
@@ -73,15 +74,13 @@ export class UsuariosController {
   findOne(@Param('id') id: string) {
     return this.usuariosService.findOne(id);
   }
-
   @Post(':id/estado')
-  @UseGuards(AdminGuard)
+  @UseGuards(JwtCookieGuard, AdminGuard)
   update(@Param('id') id: string) {
     return this.usuariosService.darDeAlta(id);
   }
-
   @Delete(':id')
-  @UseGuards(AdminGuard)
+  @UseGuards(JwtCookieGuard, AdminGuard)
   remove(@Param('id') id: string) {
     return this.usuariosService.darDeBaja(id);
   }

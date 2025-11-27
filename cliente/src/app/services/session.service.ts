@@ -25,7 +25,6 @@ export class SessionService {
     // Si minutes=10, warningMs = 5min
     this.warningTimer = setTimeout(() => this.promptExtend(), warningMs);
     this.expiryTimer = setTimeout(() => this.onExpiry(), expiryMs);
-    console.log('Timers iniciados: alerta en: ', warningMs, 'ms, token expira en: ', expiryMs, 'ms');
   }
 
   stop() {

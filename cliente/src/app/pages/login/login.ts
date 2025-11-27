@@ -27,13 +27,12 @@ export class Login {
       this.auth.loginCookie({ nombreUsuario: nombreUsuario ?? '', contrasena: password ?? '' }).subscribe({
         next: (respuesta: any) => {
           console.log('Login (cookie) respuesta:', respuesta);
+          this.auth.logout();
           this.auth.authState.set(true);
           this.session.start(10);
           this.router.navigate(['/publicaciones']);
         },
         error: (err) => {
-          console.error('Error en login cookie:', err);
-          this.toastr.error('Nombre de usuario o contraseña incorrectos', '401');
           this.auth.authState.set(false);
         }
       });

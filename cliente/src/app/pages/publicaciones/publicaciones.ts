@@ -117,7 +117,6 @@ export class Publicaciones implements OnInit {
           return fb - fa; // descendente: más reciente primero
         });
         this.publicaciones = lista;
-        console.log('Publicaciones cargadas:', this.publicaciones.map((porqueria:any)=>porqueria.fechaCreacion));
       },
       error: (err) => {
         console.error('Error cargando publicaciones:', err);

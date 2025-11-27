@@ -125,6 +125,10 @@ export class AuthService {
       throw new UnauthorizedException('Usuario no encontrado');
     }
 
+    if (usuario.activo === false) {
+      throw new UnauthorizedException('Tu cuenta está dada de baja');
+    }
+
     const contrasenaValida = await bcrypt.compare(
       loginData.contrasena,
       usuario.contrasena,
@@ -134,7 +138,6 @@ export class AuthService {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
-    // Generar token con la id incluida
     const token = this.guardarEnCookie(
       usuario.nombreUsuario,
       usuario.imagenUrl,

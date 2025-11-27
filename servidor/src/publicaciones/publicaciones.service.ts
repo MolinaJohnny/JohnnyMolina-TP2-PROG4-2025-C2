@@ -276,4 +276,16 @@ export class PublicacionesService {
       comentario,
     };
   }
+  async marcarPublicacionesEliminadasPorUsuario(usuarioId: string) {
+    await this.instModel.updateMany(
+      { usuarioId: usuarioId },
+      { $set: { eliminada: true } },
+    );
+  }
+  async restaurarPublicacionesDeUsuario(usuarioId: string) {
+    await this.instModel.updateMany(
+      { usuarioId: usuarioId },
+      { $set: { eliminada: false } },
+    );
+  }
 }

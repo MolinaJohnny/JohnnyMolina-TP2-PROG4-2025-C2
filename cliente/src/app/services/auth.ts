@@ -23,7 +23,6 @@ export class Auth {
       withCredentials: true,
     })
     const data : any = await firstValueFrom(observable)
-    console.log(data);
     return data;
   }
   register(usuario: FormData) {

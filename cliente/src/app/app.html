@@ -71,10 +71,10 @@
                     <button *ngIf="isAuthenticated()" class="nav-link fw-bold py-1 px-0 active" routerLink="publicaciones">Publicaciones</button>
                     <button *ngIf="!(isAuthenticated())" class="nav-link fw-bold py-1 px-0" routerLink="login"> Login</button>
                     <button *ngIf="!(isAuthenticated())" class="nav-link fw-bold py-1 px-0" routerLink="registro"> Registro</button>
-                    <button *ngIf="isAuthenticated()" class="nav-link fw-bold py-1 px-0" type="button" (click)="logout()">Cerrar sesión</button>
                     <button *ngIf="isAuthenticated()" class="nav-link fw-bold py-1 px-0" routerLink="mi-perfil"> Mi perfil</button>
                     <button *ngIf="isAuthenticated() && usuarioActual == 'admin'" class="nav-link fw-bold py-1 px-0" routerLink="dashboard"> Dashboard</button>
                     <button *ngIf="isAuthenticated() && usuarioActual == 'admin'" class="nav-link fw-bold py-1 px-0" routerLink="estadisticas"> Estadisticas</button>
+                    <button *ngIf="isAuthenticated()" class="nav-link fw-bold py-1 px-0" type="button" (click)="logout()">Cerrar sesión</button>
                 </nav>
             </div>
         </header>

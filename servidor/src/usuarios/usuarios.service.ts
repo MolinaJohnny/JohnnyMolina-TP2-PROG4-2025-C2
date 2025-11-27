@@ -9,10 +9,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Usuario } from './entities/usuario.entity';
 import { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { PublicacionesService } from '../publicaciones/publicaciones.service';
 @Injectable()
 export class UsuariosService {
-  constructor(@InjectModel(Usuario.name) private instModel: Model<Usuario>) {}
-
+  constructor(
+    @InjectModel(Usuario.name) private instModel: Model<Usuario>,
+    private readonly publicacionesService: PublicacionesService,
+  ) {}
   async create(createUsuarioDto: CreateUsuarioDto) {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(createUsuarioDto.contrasena, salt);
@@ -82,13 +85,19 @@ export class UsuariosService {
     }
 
     usuario.activo = false;
-    return usuario.save();
+    await usuario.save();
+
+    await this.publicacionesService.marcarPublicacionesEliminadasPorUsuario(id);
+
+    return usuario;
   }
   async darDeAlta(id: string) {
     const usuario = await this.instModel.findById(id);
     if (!usuario) {
       throw new NotFoundException('Usuario no encontrado');
     }
+
+    await this.publicacionesService.restaurarPublicacionesDeUsuario(id);
 
     usuario.activo = true;
     return usuario.save();

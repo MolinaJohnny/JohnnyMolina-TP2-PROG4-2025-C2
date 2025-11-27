@@ -20,25 +20,19 @@ export class App implements OnInit {
   isInitialized = this.auth.isInitialized;
   
   showSplash = signal(true);
-  usuarioActual : any;
+  usuarioActual: any = signal<string | null>(null);
   async ngOnInit() {
     setTimeout(() => {
       this.validar();
     }, 2000);
-    const data = await this.auth.dataCookie();
-    if (data.resultado.usuario.activo === false) {
-    this.auth.clearToken();
-    this.router.navigate(['/login']);
-      }
-    this.usuarioActual = await data.resultado.usuario.perfil;
   }
 
   async validar() {
     try {
       const data = await this.auth.dataCookie();
-
       if (data?.resultado?.token) {
         this.auth.authState.set(true);
+        this.usuarioActual = data.resultado.usuario.perfil;
       } else {
         this.auth.clearToken();
         this.router.navigate(['/login']);
@@ -54,11 +48,11 @@ export class App implements OnInit {
   }
 
   logout() {
+    this.router.navigate(['/login']);
 
     this.auth.logout().subscribe({
       next: () => {
         this.auth.clearToken();
-        this.router.navigate(['/login']);
         window.location.reload();
 
       },

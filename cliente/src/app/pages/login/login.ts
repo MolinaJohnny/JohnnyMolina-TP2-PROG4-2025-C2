@@ -26,9 +26,10 @@ export class Login {
       const { nombreUsuario, password } = this.loginForm.value;
       this.auth.loginCookie({ nombreUsuario: nombreUsuario ?? '', contrasena: password ?? '' }).subscribe({
         next: (respuesta: any) => {
+          this.auth.usuarioActual.set(respuesta.resultado.usuario.perfil);
           console.log('Login (cookie) respuesta:', respuesta);
-          this.auth.logout();
           this.auth.authState.set(true);
+
           this.session.start(10);
           this.router.navigate(['/publicaciones']);
         },
@@ -43,9 +44,12 @@ export class Login {
 
   logueo() {
     this.auth.loginCookie({ nombreUsuario: 'Fionas', contrasena: 'Fiona123' }).subscribe({
-      next: (resp) => {
+      next: (resp : any) => {
         console.log('logueo test ok', resp);
+        this.auth.usuarioActual.set(resp.resultado.usuario.perfil);
+
         this.auth.authState.set(true);
+        
         this.session.start(10);
         this.router.navigate(['/publicaciones']);
       },

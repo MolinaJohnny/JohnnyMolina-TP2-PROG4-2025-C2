@@ -9,7 +9,8 @@ import { environment } from '../../environments/environment';
 })
 export class Auth {
   httpClient = inject(HttpClient);
-  
+  usuarioActual = signal<string | null>(null);   
+
   authState = signal<boolean>(false);
   isInitialized = signal<boolean>(false);
 

@@ -64,4 +64,15 @@
   display: flex;
   flex-direction: column;
 }
+.nav-masthead .nav-link {
+  color: rgba(255, 255, 255, .5);
+  border-bottom: .25rem solid transparent;
+  transition: color .2s ease, border .2s ease;
+}
+
+.nav-masthead .nav-link:hover,
+.nav-masthead .nav-link.active {
+  color: #fff;
+  border-bottom-color: #fff;
+}
 

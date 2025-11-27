@@ -81,8 +81,7 @@ export class Publicaciones implements OnInit {
     
     this.publicacionesService.subirPublicacion(formData).subscribe({
       next: () => {
-        console.log('Publicación subida con éxito');
-        
+        this.toastr.success('Publicación subida correctamente', 'Éxito');        
         this.postForm.reset();
         this.imagenSeleccionada = null;
         
@@ -90,6 +89,7 @@ export class Publicaciones implements OnInit {
       },
       error: (err) => {
         console.error('Error al subir publicación:', err);
+        this.toastr.error('Error al subir la publicación', 'Error');
       },
     });
   }
@@ -102,7 +102,7 @@ export class Publicaciones implements OnInit {
       : this.filtros.offset;
 
     const opts: any = {
-      sort: this.filtros.sort || 'date',
+      sort: this.filtros.sort,
       offset: offset,
       limit: limit,
     };
@@ -111,11 +111,21 @@ export class Publicaciones implements OnInit {
     this.publicacionesService.obtenerPublicaciones(opts).subscribe({
       next: (datos: any) => {
         const lista = Array.isArray(datos) ? datos : datos?.data ?? [];
-        lista.sort((a: any, b: any) => {
-          const fa = a?.fechaCreacion ? new Date(a.fechaCreacion).getTime() : 0;
-          const fb = b?.fechaCreacion ? new Date(b.fechaCreacion).getTime() : 0;
-          return fb - fa; // descendente: más reciente primero
-        });
+        if (this.filtros.sort === 'likes') {
+          // Ordenar por cantidad de likes (descendente)
+          lista.sort((a: any, b: any) => {
+            const la = a?.likes?.length ?? 0;
+            const lb = b?.likes?.length ?? 0;
+            return lb - la;
+          });
+        } else {
+          // Ordenar por fecha (descendente)
+          lista.sort((a: any, b: any) => {
+            const fa = a?.fechaCreacion ? new Date(a.fechaCreacion).getTime() : 0;
+            const fb = b?.fechaCreacion ? new Date(b.fechaCreacion).getTime() : 0;
+            return fb - fa;
+          });
+        }
         this.publicaciones = lista;
       },
       error: (err) => {

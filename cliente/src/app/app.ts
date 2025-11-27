@@ -1,12 +1,12 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
-import { RouterLink, RouterOutlet, Router } from '@angular/router';
+import { RouterLink, RouterOutlet, Router, RouterLinkActive } from '@angular/router';
 import { NgIf, CommonModule } from '@angular/common';
 import { Auth } from './services/auth';
 import { SessionService } from './services/session.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, NgIf, CommonModule],
+  imports: [RouterOutlet, RouterLink, NgIf, CommonModule, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -20,7 +20,7 @@ export class App implements OnInit {
   isInitialized = this.auth.isInitialized;
   
   showSplash = signal(true);
-  usuarioActual: any = signal<string | null>(null);
+  usuarioActual = this.auth.usuarioActual;
   async ngOnInit() {
     setTimeout(() => {
       this.validar();
@@ -32,7 +32,7 @@ export class App implements OnInit {
       const data = await this.auth.dataCookie();
       if (data?.resultado?.token) {
         this.auth.authState.set(true);
-        this.usuarioActual = data.resultado.usuario.perfil;
+        this.usuarioActual.set(data.resultado.usuario.perfil);
       } else {
         this.auth.clearToken();
         this.router.navigate(['/login']);

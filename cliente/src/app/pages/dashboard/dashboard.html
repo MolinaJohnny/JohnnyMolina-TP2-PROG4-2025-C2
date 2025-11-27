@@ -2,6 +2,7 @@
 	<h3>Usuarios</h3>
 	<button class="btn btn-primary" type="button" (click)="abrirModal()">Nuevo usuario</button>
 </div>
+<div class="usuarios-scroll">
 
 <div class="row g-3">
 	<div class="col-12 col-md-6" *ngFor="let u of listadoUsuarios">
@@ -30,7 +31,7 @@
 		</div>
 	</div>
 </div>
-
+</div>
 
 
 <div *ngIf="modalAbierto" class="modal-overlay" (click)="cerrarModal()">

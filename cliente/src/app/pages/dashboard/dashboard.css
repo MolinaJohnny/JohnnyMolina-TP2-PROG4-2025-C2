@@ -1,4 +1,8 @@
-/* Modal overlay styles (Angular-controlled) */
+.usuarios-scroll {
+  max-height: 70vh;   
+  overflow-y: auto;
+  padding-right: 10px; 
+}
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -19,7 +23,7 @@
   max-width: 600px;
   margin: auto;
   display: block;
-  transform: translateY(4vh); /* slight downward offset */
+  transform: translateY(4vh);
 }
 
 .modal-overlay .modal-dialog {
